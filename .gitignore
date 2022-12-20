@@ -1,0 +1,45 @@
+node_modules/
+
+### Shared
+
+# dependencies
+packages/shared/node_modules/
+
+# compiled js files
+packages/shared/dist/
+
+### Back End
+
+# dependencies
+packages/cosmocam-backend/node_modules/
+
+# secrets
+packages/cosmocam-backend/.env
+packages/cosmocam-backend/ssl/
+
+# compiled js files
+packages/cosmocam-backend/dist/
+
+### Front end
+
+# dependencies
+packages/cosmocam-frontend/node_modules/
+/.pnp
+.pnp.js
+
+# testing
+packages/cosmocam-frontend/coverage
+
+# production
+packages/cosmocam-frontend/build/
+
+# misc
+packages/cosmocam-frontend/.DS_Store
+packages/cosmocam-frontend/.env.local
+packages/cosmocam-frontend/.env.development.local
+packages/cosmocam-frontend/.env.test.local
+packages/cosmocam-frontend/.env.production.local
+
+packages/cosmocam-frontend/npm-debug.log*
+packages/cosmocam-frontend/yarn-debug.log*
+packages/cosmocam-frontend/yarn-error.log*
