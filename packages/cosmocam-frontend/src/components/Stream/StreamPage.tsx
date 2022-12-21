@@ -11,8 +11,8 @@ export const StreamPage = () => {
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
 
-  socket.on("connection-success", (socketId) => {
-    console.log(socketId);
+  socket.on("connection-success", ({ socketId, existsProducer }) => {
+    console.log(socketId, existsProducer);
   });
 
   let device: any;
@@ -21,6 +21,7 @@ export const StreamPage = () => {
   let producer: any;
   let consumerTransport: any;
   let consumer: any;
+  let isProducer = false;
 
   let params: any = {
     encoding: [
@@ -45,10 +46,10 @@ export const StreamPage = () => {
     },
   };
 
-  const streamSuccess = async (stream: MediaStream) => {
+  const streamSuccess = (stream: MediaStream) => {
     if (localVideo.current) {
       localVideo.current.srcObject = stream;
-      await localVideo.current.play();
+      localVideo.current.play();
     }
     const videoTrack = stream.getVideoTracks()[0];
     const audioTrack = stream.getAudioTracks()[0];
@@ -56,6 +57,7 @@ export const StreamPage = () => {
       track: videoTrack,
       ...params,
     };
+    goConnect(true);
   };
 
   const getLocalStream = () => {
@@ -79,13 +81,27 @@ export const StreamPage = () => {
       });
   };
 
+  const goConsume = () => {
+    goConnect(false);
+  };
+
+  const goConnect = (producerOrConsumer) => {
+    isProducer = producerOrConsumer;
+    device === undefined ? getRtpCapabilities() : goCreateTransport();
+  };
+
+  const goCreateTransport = () => {
+    isProducer ? createSendTransport() : createRecvTransport();
+  };
+
   const createDevice = async () => {
     try {
       device = new mediasoupClient.Device();
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
-      console.log("RTP Capabilities: ", rtpCapabilities);
+      console.log("Device RTP Capabilities: ", rtpCapabilities);
+      goCreateTransport();
     } catch (err) {
       console.log(err);
     }
@@ -93,10 +109,11 @@ export const StreamPage = () => {
 
   const getRtpCapabilities = () => {
     socket.emit(
-      "getRtpCapabilities",
+      "createRoom",
       (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
         console.log(`rtpCapabilities: ${data.rtpCapabilities}`);
         rtpCapabilities = data.rtpCapabilities;
+        createDevice();
       }
     );
   };
@@ -160,6 +177,8 @@ export const StreamPage = () => {
             }
           }
         );
+
+        connectSendTransport();
       }
     );
   };
@@ -208,6 +227,8 @@ export const StreamPage = () => {
             }
           }
         );
+
+        connectRecvTransport();
       }
     );
   };
@@ -257,27 +278,12 @@ export const StreamPage = () => {
       <Grid container spacing={1} sx={{ marginTop: 1 }}>
         <Grid item xs={12}>
           <Button variant="contained" onClick={getLocalStream}>
-            1. Get Video
-          </Button>
-          <Button variant="contained" onClick={getRtpCapabilities}>
-            2. Get RTP Capabilities
-          </Button>
-          <Button variant="contained" onClick={createDevice}>
-            3. Create Device
-          </Button>
-          <Button variant="contained" onClick={createSendTransport}>
-            4. Create Send Transport
-          </Button>
-          <Button variant="contained" onClick={connectSendTransport}>
-            5. Connect Send Transport
+            Publish
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <Button variant="contained" onClick={createRecvTransport}>
-            6. Create Receive Transport
-          </Button>
-          <Button variant="contained" onClick={connectRecvTransport}>
-            7. Connect Receive Transport
+          <Button variant="contained" onClick={goConsume}>
+            Consume
           </Button>
         </Grid>
         <Grid item xs={12}>

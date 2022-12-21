@@ -1,13 +1,12 @@
 import express from "express";
 import userRouter from "./src/routes/user.router";
 import authenticationRouter from "./src/routes/authentication.router";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
 import https from "https";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
-import { fileURLToPath } from "url";
 const mediasoup = require("mediasoup");
 
 const app = express();
@@ -40,7 +39,11 @@ const httpsServer = https.createServer(options, app);
 // Catch all
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(
-    path.join(__dirname, "public", "../../cosmocam-frontend/build/index.html")
+    path.join(
+      __dirname,
+      "public",
+      "../../../cosmocam-frontend/build/index.html"
+    )
   );
 });
 
@@ -99,13 +102,28 @@ const peers = io.of("/mediasoup");
 peers.on("connection", async (socket) => {
   console.log(`socket connected: ${socket.id}`);
   socket.emit("connection-success", {
-    socketID: socket.id,
+    socketId: socket.id,
+    existsProducer: producer ? true : false,
   });
 
   socket.on("disconnect", () => {
     //cleanup
     console.log(`socket disconnected: ${socket.id}`);
   });
+
+  socket.on("createRoom", async (callback) => {
+    if (router === undefined) {
+      router = await worker.createRouter({ mediaCodecs });
+      console.log(`Router ID: ${router.id}`);
+    }
+
+    getRtpCapabilities(callback);
+  });
+
+  const getRtpCapabilities = (callback: ({}) => void) => {
+    const rtpCapabilities = router.rtpCapabilities;
+    callback({ rtpCapabilities });
+  };
 
   router = await worker.createRouter({ mediaCodecs });
 
