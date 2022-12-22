@@ -21,7 +21,7 @@ export const StreamPage = () => {
   let producer: any;
   let consumerTransport: any;
   let consumer: any;
-  let isProducer = false;
+  let isProducer: boolean = false;
 
   let params: any = {
     encoding: [
@@ -85,7 +85,7 @@ export const StreamPage = () => {
     goConnect(false);
   };
 
-  const goConnect = (producerOrConsumer) => {
+  const goConnect = (producerOrConsumer: boolean) => {
     isProducer = producerOrConsumer;
     device === undefined ? getRtpCapabilities() : goCreateTransport();
   };
