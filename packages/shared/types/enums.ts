@@ -6,6 +6,24 @@ export enum apis {
   UPDATE_USER = "/users/update",
 }
 
+export enum pathNames {
+  LOGIN = "/",
+  REGISTER = "/register",
+  DASHBOARD = "/dashboard",
+  STREAM = "/stream",
+  VIEW = "/view",
+  ACCOUNT = "/account",
+}
+
+export enum pageNames {
+  LOGIN = "Login",
+  REGISTER = "Register",
+  DASHBOARD = "Dashboard",
+  STREAM = "Stream Video",
+  VIEW = "View",
+  ACCOUNT = "Account Settings",
+}
+
 export enum userCreationMessages {
   CREATED_SUCCESSFULLY = "user created successfully",
   NOT_CREATED = "user not created",

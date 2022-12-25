@@ -1,28 +1,46 @@
-import { LoginPage } from "../Login/LoginPage";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { RegisterPage } from "../Register/RegisterPage";
 import { ProtectedRoute } from "./ProtectedRoutes";
-import { Dashboard } from "../Dashboard/Dashboard";
 import { Headerbar } from "../Headerbar/Headerbar";
 import { useAuthenticateToken } from "../../hooks/authentication";
-import { AccountPage } from "../Account/AccountPage";
-import { StreamPage } from "../Stream/StreamPage";
-import { ViewPage } from "../View/ViewPage";
+import { ApplicationBar } from "../ApplicationBar/ApplicationBar";
+import { useUserContext } from "../Context/Providers";
+import { pathNames } from "@cosmocam/shared";
+import { routes } from "./RoutesData";
 
 export const ApplicationRoutes = () => {
   useAuthenticateToken();
+  const { isLoggedIn } = useUserContext();
 
   return (
     <BrowserRouter>
       <Headerbar />
+      {isLoggedIn && <ApplicationBar />}
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path={pathNames.LOGIN}
+          element={routes[pathNames.LOGIN].element}
+        />
+        <Route
+          path={pathNames.REGISTER}
+          element={routes[pathNames.REGISTER].element}
+        />
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/account" element={<AccountPage />} />
-          <Route path="/stream" element={<StreamPage />} />
-          <Route path="/view" element={<ViewPage />} />
+          <Route
+            path={pathNames.DASHBOARD}
+            element={routes[pathNames.DASHBOARD].element}
+          />
+          <Route
+            path={pathNames.ACCOUNT}
+            element={routes[pathNames.ACCOUNT].element}
+          />
+          <Route
+            path={pathNames.STREAM}
+            element={routes[pathNames.STREAM].element}
+          />
+          <Route
+            path={pathNames.VIEW}
+            element={routes[pathNames.VIEW].element}
+          />
         </Route>
       </Routes>
     </BrowserRouter>
