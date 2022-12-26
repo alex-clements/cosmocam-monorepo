@@ -1,5 +1,5 @@
 import { Button } from "@mui/material";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { io } from "socket.io-client";
 import { types as mediasoupTypes } from "mediasoup-client";
 import Box from "@mui/material/Box";
@@ -15,6 +15,7 @@ export const StreamPage = () => {
     console.log(socketId, existsProducer);
   });
 
+  const streamRef = useRef<MediaStream>();
   let device: any;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport: any;
@@ -47,12 +48,12 @@ export const StreamPage = () => {
   };
 
   const streamSuccess = (stream: MediaStream) => {
+    streamRef.current = stream;
     if (localVideo.current) {
       localVideo.current.srcObject = stream;
       localVideo.current.play();
     }
     const videoTrack = stream.getVideoTracks()[0];
-    const audioTrack = stream.getAudioTracks()[0];
     params = {
       track: videoTrack,
       ...params,
@@ -272,6 +273,14 @@ export const StreamPage = () => {
       }
     );
   };
+
+  useEffect(() => {
+    return () => {
+      console.log("stopping");
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

@@ -42,3 +42,8 @@ export interface UserContextInterface {
   setIsLoggedIn: Dispatch<SetStateAction<boolean>>;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
 }
+
+export interface ToastContextInterface {
+  toastMessage: string;
+  setToastMessage: Dispatch<SetStateAction<string>>;
+}

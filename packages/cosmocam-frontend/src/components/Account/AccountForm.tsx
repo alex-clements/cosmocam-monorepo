@@ -11,11 +11,8 @@ export const AccountForm = () => {
   const [newUsername, setNewUsername] = useState<string>(username);
   const [oldPassword, setOldPassword] = useState<string>("");
   const [newPassword, setNewPassword] = useState<string>("");
-  const [visible, setVisible] = useState<boolean>(true);
   const [toastMessage, setToastMessage] = useState("");
   const [toastOpen, setToastOpen] = useState(false);
-
-  console.log("test");
 
   const handleSubmit = () => {
     update({
@@ -35,7 +32,7 @@ export const AccountForm = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: visible ? 1 : 0 }}>
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <Toast messageProp={toastMessage} openProp={toastOpen} />
       <Stack sx={{ color: "white" }} spacing={2}>
         <CssTextField

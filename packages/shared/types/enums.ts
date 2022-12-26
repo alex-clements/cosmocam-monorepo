@@ -15,6 +15,10 @@ export enum pathNames {
   ACCOUNT = "/account",
 }
 
+export enum cookieValues {
+  USER = "user",
+}
+
 export enum pageNames {
   LOGIN = "Login",
   REGISTER = "Register",

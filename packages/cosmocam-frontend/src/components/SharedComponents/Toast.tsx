@@ -25,7 +25,7 @@ export const Toast = ({ messageProp, openProp }: ToastProps) => {
     if (openProp) {
       setState({ ...state, open: true, message: messageProp });
     } else {
-      setState({ ...state, message: messageProp });
+      setState({ ...state, open: false, message: messageProp });
     }
   }, [openProp, messageProp]);
 

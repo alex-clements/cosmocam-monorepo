@@ -6,40 +6,46 @@ import { userAuthenticationMessages } from "@cosmocam/shared";
 import { useUserContext } from "../components/Context/Providers";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
+import { pathNames, cookieValues } from "@cosmocam/shared";
+import { useToastContext } from "../components/Context/Providers";
 
 export const useAuthenticateUser = () => {
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies(["user"]);
+  const [cookies, setCookie] = useCookies([cookieValues.USER]);
   const { setUsername, setEmail, setIsLoggedIn, setToken, setIsLoading } =
     useUserContext();
+  const { setToastMessage } = useToastContext();
 
-  const returnFunction = ({ password, email }: UserCredentials) => {
-    authenticateUser({ password, email })
-      .then((response) => {
-        if (response.data.message === userAuthenticationMessages.SUCCESS) {
-          setUsername(response.data.username);
-          setEmail(response.data.email);
-          setToken(response.data.token);
-          setIsLoggedIn(true);
-          setIsLoading(false);
+  const returnFunction = async ({ password, email }: UserCredentials) => {
+    try {
+      const response = await authenticateUser({ password, email });
+      if (response.data.message === userAuthenticationMessages.SUCCESS) {
+        setUsername(response.data.username);
+        setEmail(response.data.email);
+        setToken(response.data.token);
+        setIsLoggedIn(true);
+        setIsLoading(false);
 
-          setCookie("user", {
-            username: response.data.username,
-            email: response.data.email,
-            token: response.data.token,
-          });
+        setCookie(cookieValues.USER, {
+          username: response.data.username,
+          email: response.data.email,
+          token: response.data.token,
+        });
 
-          navigate("/dashboard");
-        }
-      })
-      .catch((err) => console.log(err));
+        navigate(pathNames.DASHBOARD);
+      } else {
+        setToastMessage("Wrong username / password combo");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return { returnFunction };
 };
 
 export const useAuthenticateToken = () => {
-  const [cookie, setCookie] = useCookies(["user"]);
+  const [cookie, setCookie] = useCookies([cookieValues.USER]);
   const mytoken = cookie?.user?.token;
   const { setUsername, setEmail, setIsLoggedIn, setIsLoading, setToken } =
     useUserContext();
