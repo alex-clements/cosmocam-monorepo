@@ -1,19 +1,40 @@
-FROM node:18 AS stage-one
+FROM node:18 
+# AS stage-one
 
 # Install DEB dependencies and others.
 RUN \
 	set -x \
 	&& apt-get update \
-	&& apt-get install -y net-tools build-essential python3 python3-pip valgrind \
-    && npm install --global yarn
+	&& apt-get install -y net-tools build-essential python3 python3-pip valgrind
 
 WORKDIR /cosmocam-monorepo
 
 COPY package.json .
-RUN npm install
-COPY server.js .
-COPY config.js .
-COPY lib lib
-COPY certs certs
+COPY yarn.lock .
+COPY lerna.json .
 
-CMD ["node", "/service/server.js"]
+COPY ./packages/cosmocam-backend/src ./packages/cosmocam-backend/src
+COPY ./packages/cosmocam-backend/ssl ./packages/cosmocam-backend/ssl
+COPY ./packages/cosmocam-backend/.env ./packages/cosmocam-backend/.env
+COPY ./packages/cosmocam-backend/package-lock.json ./packages/cosmocam-backend/package-lock.json
+COPY ./packages/cosmocam-backend/package.json ./packages/cosmocam-backend/package.json
+COPY ./packages/cosmocam-backend/server.ts ./packages/cosmocam-backend/server.ts
+COPY ./packages/cosmocam-backend/tsconfig.json ./packages/cosmocam-backend/tsconfig.json
+COPY ./packages/cosmocam-backend/yarn.lock ./packages/cosmocam-backend/yarn.lock
+
+COPY ./packages/cosmocam-frontend/src ./packages/cosmocam-frontend/src
+COPY ./packages/cosmocam-frontend/public ./packages/cosmocam-frontend/public
+COPY ./packages/cosmocam-frontend/package.json ./packages/cosmocam-frontend/package.json
+COPY ./packages/cosmocam-frontend/tsconfig.json ./packages/cosmocam-frontend/tsconfig.json
+COPY ./packages/cosmocam-frontend/yarn.lock ./packages/cosmocam-frontend/yarn.lock
+
+COPY ./packages/shared/types ./packages/shared/types
+COPY ./packages/shared/index.ts ./packages/shared/index.ts
+COPY ./packages/shared/package.json ./packages/shared/package.json
+COPY ./packages/shared/tsconfig.json ./packages/shared/tsconfig.json
+
+RUN yarn install
+RUN cd packages/shared && tsc
+RUN cd ../cosmocam-frontend && yarn build
+
+CMD ["node", "./packages/cosmocam-backend/dist/server.js"]
