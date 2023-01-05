@@ -36,5 +36,6 @@ COPY ./packages/shared/tsconfig.json ./packages/shared/tsconfig.json
 RUN yarn install
 RUN cd packages/shared && tsc
 RUN cd ../cosmocam-frontend && yarn build
+RUN cd ../cosmocam-backend && NODE_ENV=production
 
 CMD ["node", "./packages/cosmocam-backend/dist/server.js"]

@@ -26,6 +26,7 @@
   },
   "scripts": {
     "compile": "tsc --watch",
-    "start": "nodemon dist/server.js"
+    "start": "NODE_ENV=development && nodemon dist/server.js",
+    "prod": "NODE_ENV=production && nodemon dist/server.js"
   }
 }

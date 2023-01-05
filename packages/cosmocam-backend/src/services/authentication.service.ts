@@ -71,7 +71,7 @@ const authenticateToken = async ({
   if (!token || tokenBlacklist.hasToken(token))
     return {
       status: statusMessages.NOT_OK,
-      message: "token not valid",
+      message: userAuthenticationMessages.TOKEN_NOT_VALID,
     };
 
   let userResponse: { username: string } | undefined;
@@ -91,14 +91,14 @@ const authenticateToken = async ({
 
     return {
       status: statusMessages.OK,
-      message: "token validated",
+      message: userAuthenticationMessages.TOKEN_VALIDATED,
       username: userUsername,
       email: userEmail,
     };
   } else {
     return {
       status: statusMessages.NOT_OK,
-      message: "token expired",
+      message: userAuthenticationMessages.TOKEN_EXPIRED,
     };
   }
 };
@@ -109,7 +109,7 @@ const logout = async ({ token }: TokenProps): Promise<CosmocamResponse> => {
 
   return {
     status: statusMessages.OK,
-    message: "logged out",
+    message: userAuthenticationMessages.LOGGED_OUT,
   };
 };
 

@@ -5,6 +5,9 @@ import { motion } from "framer-motion";
 import { Link } from "@mui/material";
 import { CssTextField } from "../SharedComponents/SharedComponents";
 import { useAuthenticateUser } from "../../hooks/authentication";
+import { labels } from "../../data/labels";
+
+const lang = "en";
 
 const LoginForm = () => {
   const [email, setEmailState] = useState("");
@@ -26,7 +29,7 @@ const LoginForm = () => {
       <Stack sx={{ color: "white" }} spacing={2}>
         <CssTextField
           id="outlined-basic"
-          label="email"
+          label={labels.email[lang]}
           variant="outlined"
           value={email}
           onChange={(e) => setEmailState(e.target.value)}
@@ -40,7 +43,7 @@ const LoginForm = () => {
         <CssTextField
           id="outlined-password-input"
           variant="outlined"
-          label="password"
+          label={labels.password[lang]}
           type="password"
           autoComplete="current-password"
           value={password}
@@ -52,9 +55,9 @@ const LoginForm = () => {
           }}
         />
         <Button onClick={handleSubmit} variant="contained">
-          Login
+          {labels.login[lang]}
         </Button>
-        <Link href="register">Create Account</Link>
+        <Link href="register">{labels.createAccount[lang]}</Link>
       </Stack>
     </motion.div>
   );

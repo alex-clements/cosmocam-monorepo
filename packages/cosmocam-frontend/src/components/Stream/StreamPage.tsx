@@ -296,24 +296,10 @@ export const StreamPage = () => {
           </Button>
         </Grid>
         <Grid item xs={12}>
-          <video
-            autoPlay
-            loop
-            controls
-            playsInline
-            muted
-            ref={localVideo}
-          ></video>
+          <video autoPlay loop playsInline muted ref={localVideo}></video>
         </Grid>
         <Grid item xs={12}>
-          <video
-            autoPlay
-            loop
-            controls
-            playsInline
-            muted
-            ref={remoteVideo}
-          ></video>
+          <video autoPlay loop playsInline muted ref={remoteVideo}></video>
         </Grid>
       </Grid>
     </Box>

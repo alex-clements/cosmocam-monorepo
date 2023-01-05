@@ -6,13 +6,13 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { useNavigate, useLocation } from "react-router";
 import { ArrowBack } from "@mui/icons-material";
 import { routes } from "../Routes/RoutesData";
-import { pageNames } from "@cosmocam/shared";
+import { pageNames, pathNames } from "@cosmocam/shared";
+import { IconButton } from "@mui/material";
 
 const darkTheme = createTheme({
   palette: {
-    mode: "dark",
     primary: {
-      main: "#1976d2",
+      main: "#0C2D48",
     },
   },
 });
@@ -24,7 +24,7 @@ export const ApplicationBar = () => {
   const pageTitle: string = routes[location.pathname]?.pagename;
 
   const handleBack = () => {
-    navigate("/dashboard");
+    navigate(pathNames.DASHBOARD);
   };
 
   return (
@@ -33,9 +33,9 @@ export const ApplicationBar = () => {
         <AppBar position="static">
           <Toolbar variant="dense">
             {pageTitle !== pageNames.DASHBOARD && (
-              <div onClick={handleBack}>
-                <ArrowBack />
-              </div>
+              <IconButton size="medium" onClick={handleBack}>
+                <ArrowBack sx={{ color: "white" }} fontSize="inherit" />
+              </IconButton>
             )}
             <Box sx={{ flexGrow: 1 }}></Box>
             <Typography variant="h6" color="inherit" component="div">

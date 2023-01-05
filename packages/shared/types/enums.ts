@@ -39,6 +39,10 @@ export enum userAuthenticationMessages {
   USER_NOT_EXIST = "user does not exist",
   SUCCESS = "login successful",
   PASSWORD_INCORRECT = "incorrect password",
+  TOKEN_NOT_VALID = "token not valid",
+  TOKEN_VALIDATED = "token validated",
+  TOKEN_EXPIRED = "token expired",
+  LOGGED_OUT = "logged out",
 }
 
 export enum statusMessages {
