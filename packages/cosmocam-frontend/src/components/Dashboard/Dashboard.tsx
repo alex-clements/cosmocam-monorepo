@@ -5,6 +5,8 @@ import { useUserContext } from "../Context/Providers";
 import Typography from "@mui/material/Typography";
 import TvIcon from "@mui/icons-material/Tv";
 import VideocamIcon from "@mui/icons-material/Videocam";
+import { labels, pathNames } from "@cosmocam/shared";
+import { getLabel } from "../../data/labels";
 
 export const Dashboard = () => {
   const { username } = useUserContext();
@@ -17,18 +19,18 @@ export const Dashboard = () => {
       <Grid container spacing={0}>
         <Grid item xs={12} md={6} sm={12} sx={{ marginTop: 5 }}>
           <DashboardCard
-            headerText={"Capture"}
-            url={"/stream"}
-            subheadingText={"Stream Video"}
+            headerText={getLabel(labels.CAPTURE)}
+            url={pathNames.STREAM}
+            subheadingText={getLabel(labels.STREAM_VIDEO)}
           >
             <VideocamIcon sx={{ fontSize: "100px" }} />
           </DashboardCard>
         </Grid>
         <Grid item xs={12} md={6} sm={12} sx={{ marginTop: 5 }}>
           <DashboardCard
-            headerText={"Watch"}
-            url={"/view"}
-            subheadingText={"View Streams"}
+            headerText={getLabel(labels.WATCH)}
+            url={pathNames.VIEW}
+            subheadingText={getLabel(labels.VIEW_STREAMS)}
           >
             <TvIcon sx={{ fontSize: "100px" }} />
           </DashboardCard>

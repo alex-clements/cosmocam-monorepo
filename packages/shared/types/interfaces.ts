@@ -47,3 +47,21 @@ export interface ToastContextInterface {
   toastMessage: string;
   setToastMessage: Dispatch<SetStateAction<string>>;
 }
+
+export interface RequiredLabels {
+  email: string;
+  password: string;
+  login: string;
+  createAccount: string;
+  dashboard: string;
+  welcome: string;
+  capture: string;
+  streamVideo: string;
+  watch: string;
+  viewStreams: string;
+  account: string;
+  logout: string;
+  oldPassword: string;
+  newPassword: string;
+  username: string;
+}

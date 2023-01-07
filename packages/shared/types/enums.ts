@@ -49,3 +49,21 @@ export enum statusMessages {
   OK = "ok",
   NOT_OK = "not ok",
 }
+
+export enum labels {
+  EMAIL = "email",
+  PASSWORD = "password",
+  OLD_PASSWORD = "oldPassword",
+  NEW_PASSWORD = "newPassword",
+  USERNAME = "username",
+  LOGIN = "login",
+  CREATE_ACCOUNT = "createAccount",
+  DASHBOARD = "dashboard",
+  WELCOME = "welcome",
+  CAPTURE = "capture",
+  STREAM_VIDEO = "streamVideo",
+  WATCH = "watch",
+  VIEW_STREAMS = "viewStreams",
+  ACCOUNT = "account",
+  LOGOUT = "logout",
+}

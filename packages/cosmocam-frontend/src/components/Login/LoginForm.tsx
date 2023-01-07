@@ -5,9 +5,8 @@ import { motion } from "framer-motion";
 import { Link } from "@mui/material";
 import { CssTextField } from "../SharedComponents/SharedComponents";
 import { useAuthenticateUser } from "../../hooks/authentication";
-import { labels } from "../../data/labels";
-
-const lang = "en";
+import { getLabel } from "../../data/labels";
+import { labels, pathNames } from "@cosmocam/shared";
 
 const LoginForm = () => {
   const [email, setEmailState] = useState("");
@@ -29,7 +28,7 @@ const LoginForm = () => {
       <Stack sx={{ color: "white" }} spacing={2}>
         <CssTextField
           id="outlined-basic"
-          label={labels.email[lang]}
+          label={getLabel(labels.EMAIL)}
           variant="outlined"
           value={email}
           onChange={(e) => setEmailState(e.target.value)}
@@ -43,7 +42,7 @@ const LoginForm = () => {
         <CssTextField
           id="outlined-password-input"
           variant="outlined"
-          label={labels.password[lang]}
+          label={getLabel(labels.PASSWORD)}
           type="password"
           autoComplete="current-password"
           value={password}
@@ -55,9 +54,9 @@ const LoginForm = () => {
           }}
         />
         <Button onClick={handleSubmit} variant="contained">
-          {labels.login[lang]}
+          {getLabel(labels.LOGIN)}
         </Button>
-        <Link href="register">{labels.createAccount[lang]}</Link>
+        <Link href={pathNames.REGISTER}>{getLabel(labels.CREATE_ACCOUNT)}</Link>
       </Stack>
     </motion.div>
   );

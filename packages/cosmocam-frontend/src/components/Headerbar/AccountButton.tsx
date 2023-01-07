@@ -6,6 +6,8 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { logout } from "../../services/authentication";
 import { useUserContext } from "../Context/Providers";
+import { getLabel } from "../../data/labels";
+import { labels, pathNames } from "@cosmocam/shared";
 
 export const AccountButton = () => {
   const navigate = useNavigate();
@@ -26,18 +28,18 @@ export const AccountButton = () => {
       .then(() => {
         setIsLoggedIn(false);
         setToken("");
-        navigate("/", { replace: true });
+        navigate(pathNames.LOGIN, { replace: true });
       })
       .catch((err) => {
         setIsLoggedIn(false);
         setToken("");
-        navigate("/", { replace: true });
+        navigate(pathNames.LOGIN, { replace: true });
       });
   };
 
   const handleAccountClick = () => {
     handleClose();
-    navigate("/account");
+    navigate(pathNames.ACCOUNT);
   };
 
   return (
@@ -67,8 +69,12 @@ export const AccountButton = () => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleAccountClick}>Account</MenuItem>
-        <MenuItem onClick={handleLogoutClick}>Log Out</MenuItem>
+        <MenuItem onClick={handleAccountClick}>
+          {getLabel(labels.ACCOUNT)}
+        </MenuItem>
+        <MenuItem onClick={handleLogoutClick}>
+          {getLabel(labels.LOGOUT)}
+        </MenuItem>
       </Menu>
     </div>
   );

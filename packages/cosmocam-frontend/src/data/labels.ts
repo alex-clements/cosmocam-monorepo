@@ -1,29 +1,53 @@
-export const supportedLanguages = ["en"];
+import { labels, RequiredLabels } from "@cosmocam/shared";
 
-export const getPreferredLanguage = () => {
-  let currLang = navigator.language;
-  currLang = currLang.toLowerCase();
-  if (currLang === "en-us") {
-    currLang = "en";
-  }
-  if (supportedLanguages.includes(currLang)) {
-    return currLang.toLowerCase();
-  } else {
-    return "en";
-  }
+const englishLabels: RequiredLabels = {
+  email: "email",
+  password: "password",
+  oldPassword: "old password",
+  newPassword: "new Password",
+  username: "username",
+  login: "LOGIN",
+  createAccount: "Create Account",
+  dashboard: "Dashboard",
+  welcome: "Welcome",
+  capture: "Capture",
+  streamVideo: "Stream Video",
+  watch: "Watch",
+  viewStreams: "View Streams",
+  account: "Account",
+  logout: "Log Out",
 };
 
-export const labels = {
-  email: { en: "email" },
-  password: { en: "password" },
-  login: { en: "LOGIN" },
-  createAccount: { en: "Create Account" },
-  dashboard: { en: "Dashboard" },
-  welcome: { en: "Welcome" },
-  capture: { en: "Capture" },
-  streamVideo: { en: "Stream Video" },
-  watch: { en: "Watch" },
-  viewStreams: { en: "View Streams" },
-  account: { en: "Account" },
-  logout: { en: "Log Out" },
+const supportedLanguages = {
+  en: englishLabels,
+};
+
+const getPreferredLanguage = (): string => {
+  let currLang = navigator.language;
+  currLang = currLang.toLowerCase();
+  currLang = currLang === "en-us" ? "en" : currLang;
+  return supportedLanguages.hasOwnProperty(currLang)
+    ? currLang.toLowerCase()
+    : "en";
+};
+
+const generateGetPreferredLanguageCached = () => {
+  let preferredLanguage: string;
+
+  return function () {
+    if (preferredLanguage) {
+      return preferredLanguage;
+    } else {
+      const preferredLanguage = getPreferredLanguage();
+      return preferredLanguage;
+    }
+  };
+};
+
+const getPreferredLanguageCached: () => string =
+  generateGetPreferredLanguageCached();
+
+export const getLabel = (label: labels) => {
+  const preferredLanguage = getPreferredLanguageCached();
+  return supportedLanguages[preferredLanguage][label];
 };

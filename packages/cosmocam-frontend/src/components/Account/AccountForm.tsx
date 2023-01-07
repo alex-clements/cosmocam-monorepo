@@ -5,6 +5,8 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { CssTextField } from "../SharedComponents/SharedComponents";
 import { Toast } from "../SharedComponents/Toast";
+import { labels } from "@cosmocam/shared";
+import { getLabel } from "../../data/labels";
 
 export const AccountForm = () => {
   const { username, email } = useUserContext();
@@ -37,7 +39,7 @@ export const AccountForm = () => {
       <Stack sx={{ color: "white" }} spacing={2}>
         <CssTextField
           id="outlined-basic"
-          label="username"
+          label={getLabel(labels.USERNAME)}
           variant="outlined"
           value={newUsername}
           onChange={(e) => setNewUsername(e.target.value)}
@@ -51,7 +53,7 @@ export const AccountForm = () => {
         <CssTextField
           id="outlined-password-input"
           variant="outlined"
-          label="old password"
+          label={getLabel(labels.OLD_PASSWORD)}
           type="password"
           autoComplete="current-password"
           value={oldPassword}
@@ -65,7 +67,7 @@ export const AccountForm = () => {
         <CssTextField
           id="outlined-password-input"
           variant="outlined"
-          label="new password"
+          label={getLabel(labels.NEW_PASSWORD)}
           type="password"
           autoComplete="current-password"
           value={newPassword}
