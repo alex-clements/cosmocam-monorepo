@@ -169,7 +169,7 @@ export const socketSetup = (httpsServer: https.Server) => {
   const createWebRtcTransport = async (callback: any) => {
     try {
       const webRtcTransport_options = {
-        listenIps: [{ ip: "192.168.1.170" }],
+        listenIps: [{ ip: "192.168.1.66" }],
         enableUdp: true,
         enableTcp: true,
         preferUdp: true,
