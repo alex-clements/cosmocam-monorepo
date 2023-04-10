@@ -1,6 +1,7 @@
 node_modules/
 
 ### Shared
+TODO.md
 
 # dependencies
 packages/shared/node_modules/

@@ -88,7 +88,8 @@ export const StreamPage = () => {
 
   const goConnect = (producerOrConsumer: boolean) => {
     isProducer = producerOrConsumer;
-    device === undefined ? getRtpCapabilities() : goCreateTransport();
+    // device === undefined ? getRtpCapabilities() : goCreateTransport();
+    getRtpCapabilities();
   };
 
   const goCreateTransport = () => {
@@ -197,6 +198,7 @@ export const StreamPage = () => {
   };
 
   const createRecvTransport = async () => {
+    console.log("creating transport");
     socket.emit(
       "createWebRtcTransport",
       { sender: false },
@@ -229,13 +231,16 @@ export const StreamPage = () => {
           }
         );
 
+        console.log("transport created");
         connectRecvTransport();
       }
     );
   };
 
   const connectRecvTransport = async () => {
-    await socket.emit(
+    console.log("starting connect receive transport");
+    console.log("device rtp capabilities: ", device.rtpCapabilities);
+    socket.emit(
       "consume",
       {
         rtpCapabilities: device.rtpCapabilities,

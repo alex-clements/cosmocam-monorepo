@@ -3,11 +3,13 @@ import { authenticationController } from "../controllers/authentication.controll
 
 const router = express.Router();
 
-/* POST Authenticate */
+/* POST Authenticate User */
 router.post("/user", authenticationController.authenticateUser);
 
+/* POST Authenticate Token */
 router.post("/token", authenticationController.authenticateToken);
 
+/* POST Log Out */
 router.post("/logout", authenticationController.logout);
 
 export default router;

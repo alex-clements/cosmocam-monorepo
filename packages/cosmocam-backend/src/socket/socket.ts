@@ -3,6 +3,23 @@ import { Server } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
 const mediasoup = require("mediasoup");
 
+const mediaCodecs: mediasoupTypes.RtpCodecCapability[] = [
+  {
+    kind: "audio",
+    mimeType: "audio/opus",
+    clockRate: 48000,
+    channels: 2,
+  },
+  {
+    kind: "video",
+    mimeType: "video/VP8",
+    clockRate: 90000,
+    parameters: {
+      "x-google-start-bitrate": 1000,
+    },
+  },
+];
+
 export const socketSetup = (httpsServer: https.Server) => {
   const io = new Server(httpsServer);
 
@@ -13,11 +30,16 @@ export const socketSetup = (httpsServer: https.Server) => {
   let producerTransport: mediasoupTypes.WebRtcTransport | undefined;
   let consumerTransport: mediasoupTypes.WebRtcTransport | undefined;
 
+  const getRtpCapabilities = (callback: ({}) => void) => {
+    const rtpCapabilities = router.rtpCapabilities;
+    callback({ rtpCapabilities });
+  };
+
   const createWorker = async (): Promise<mediasoupTypes.Worker> => {
     worker = await mediasoup.createWorker({
       logLevel: "warn",
       rtcMinPort: 2000,
-      rtcMaxPort: 2020,
+      rtcMaxPort: 2100,
     });
     console.log(`worker pid ${worker.pid}`);
 
@@ -32,23 +54,6 @@ export const socketSetup = (httpsServer: https.Server) => {
   createWorker().then((data) => {
     worker = data;
   });
-
-  const mediaCodecs: mediasoupTypes.RtpCodecCapability[] = [
-    {
-      kind: "audio",
-      mimeType: "audio/opus",
-      clockRate: 48000,
-      channels: 2,
-    },
-    {
-      kind: "video",
-      mimeType: "video/VP8",
-      clockRate: 90000,
-      parameters: {
-        "x-google-start-bitrate": 1000,
-      },
-    },
-  ];
 
   const peers = io.of("/mediasoup");
 
@@ -66,19 +71,13 @@ export const socketSetup = (httpsServer: https.Server) => {
 
     socket.on("createRoom", async (callback) => {
       if (router === undefined) {
+        console.log("New Router Created");
         router = await worker.createRouter({ mediaCodecs });
         console.log(`Router ID: ${router.id}`);
       }
 
       getRtpCapabilities(callback);
     });
-
-    const getRtpCapabilities = (callback: ({}) => void) => {
-      const rtpCapabilities = router.rtpCapabilities;
-      callback({ rtpCapabilities });
-    };
-
-    router = await worker.createRouter({ mediaCodecs });
 
     socket.on("getRtpCapabilities", (callback) => {
       const rtpCapabilities = router?.rtpCapabilities;
@@ -126,6 +125,7 @@ export const socketSetup = (httpsServer: https.Server) => {
 
     socket.on("consume", async ({ rtpCapabilities }, callback) => {
       try {
+        console.log("starting consume");
         if (router.canConsume({ producerId: producer.id, rtpCapabilities })) {
           consumer = await consumerTransport?.consume({
             producerId: producer.id,
@@ -149,6 +149,8 @@ export const socketSetup = (httpsServer: https.Server) => {
           };
 
           callback({ params });
+        } else {
+          console.log("router cannot consume");
         }
       } catch (error) {
         console.log(error);
@@ -180,7 +182,7 @@ export const socketSetup = (httpsServer: https.Server) => {
 
       console.log(`transport id: ${transport.id}`);
 
-      transport.on("dtlsstatechange", (dtlsState) => {
+      transport.on("dtlsstatechange", (dtlsState: any) => {
         if (dtlsState === "closed") {
           transport.close();
         }
