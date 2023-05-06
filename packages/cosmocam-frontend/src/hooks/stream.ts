@@ -1,13 +1,11 @@
 import React, { useEffect, useRef } from "react";
-import { io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import { types as mediasoupTypes } from "mediasoup-client";
-import {
-  registerSendingSocket,
-  registerReceivingSocket,
-} from "../services/socket";
-import { useUserContext } from "../components/Context/Providers";
-
+import { createLogger } from "@cosmocam/shared";
 const mediasoupClient = require("mediasoup-client");
+
+const loggingEnabled = false;
+const log = createLogger(loggingEnabled);
 
 let params: any = {
   encoding: [
@@ -32,21 +30,29 @@ let params: any = {
   },
 };
 
-export const useProducerStream = (
-  localVideo: React.RefObject<HTMLVideoElement>
-) => {
-  const socket = io("/mediasoup");
+export const useProducerStream = ({
+  socket,
+  localVideo,
+  deviceId,
+}: {
+  socket: Socket;
+  localVideo: React.RefObject<HTMLVideoElement>;
+  deviceId: string;
+}) => {
   const streamRef = useRef<MediaStream>();
-  const { token } = useUserContext();
   let device: any;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
-  let producerTransport: any;
+  let producerTransport = useRef<any>();
   let producer: any;
 
-  socket.on("connection-success", ({ socketId }) => {
-    console.log(socketId);
-    registerSendingSocket({ token, socketId });
-  });
+  useEffect(() => {
+    if (producerTransport.current) {
+      producerTransport.current.close();
+      producerTransport.current = undefined;
+    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    getLocalStream(deviceId);
+  }, [deviceId]);
 
   const streamSuccess = (stream: MediaStream) => {
     streamRef.current = stream;
@@ -59,14 +65,19 @@ export const useProducerStream = (
       ...params,
       track: videoTrack,
     };
-    goConnect(true);
+    getRtpCapabilities();
   };
 
-  const getLocalStream = () => {
+  const getLocalStream = (deviceId: string) => {
     navigator.mediaDevices
       .getUserMedia({
         audio: true,
         video: {
+          ...(deviceId && {
+            deviceId: {
+              exact: deviceId,
+            },
+          }),
           width: {
             min: 640,
             max: 1920,
@@ -79,16 +90,8 @@ export const useProducerStream = (
       })
       .then((stream) => streamSuccess(stream))
       .catch((error) => {
-        console.log(error);
+        log(error);
       });
-  };
-
-  const goConsume = () => {
-    goConnect(false);
-  };
-
-  const goConnect = (producerOrConsumer: boolean) => {
-    getRtpCapabilities();
   };
 
   const createDevice = async () => {
@@ -97,10 +100,10 @@ export const useProducerStream = (
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
-      console.log("Device RTP Capabilities: ", rtpCapabilities);
+      log("Device RTP Capabilities: ", rtpCapabilities);
       createSendTransport();
     } catch (err) {
-      console.log(err);
+      log(err);
     }
   };
 
@@ -108,7 +111,7 @@ export const useProducerStream = (
     socket.emit(
       "createRoom",
       (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
-        console.log(`rtpCapabilities: ${data.rtpCapabilities}`);
+        log(`rtpCapabilities: ${data.rtpCapabilities}`);
         rtpCapabilities = data.rtpCapabilities;
         createDevice();
       }
@@ -121,14 +124,14 @@ export const useProducerStream = (
       { sender: true },
       ({ params }: { params: any }) => {
         if (params.error) {
-          console.log(params.error);
+          log(params.error);
           return;
         }
-        console.log(params);
+        log(params);
 
-        producerTransport = device.createSendTransport(params);
+        producerTransport.current = device.createSendTransport(params);
 
-        producerTransport.on(
+        producerTransport.current.on(
           "connect",
           async (
             { dtlsParameters }: { dtlsParameters: any },
@@ -136,7 +139,7 @@ export const useProducerStream = (
             errback: (error: any) => void
           ) => {
             try {
-              await socket.emit("transport-connect", {
+              socket.emit("transport-connect", {
                 dtlsParameters: dtlsParameters,
               });
               callback();
@@ -146,20 +149,20 @@ export const useProducerStream = (
           }
         );
 
-        producerTransport.on(
+        producerTransport.current.on(
           "produce",
           async (
             parameters: any,
             callback: ({ id }: { id: string }) => void,
             errback: (error: any) => void
           ) => {
-            console.log(parameters);
+            log(parameters);
 
             try {
-              await socket.emit(
+              socket.emit(
                 "transport-produce",
                 {
-                  transportId: producerTransport.id,
+                  transportId: producerTransport.current.id,
                   kind: parameters.kind,
                   rtpParameters: parameters.rtpParameters,
                   appData: parameters.appData,
@@ -180,53 +183,42 @@ export const useProducerStream = (
   };
 
   const connectSendTransport = async () => {
-    console.log(params);
-    producer = await producerTransport.produce(params);
+    log(params);
+    producer = await producerTransport.current.produce(params);
 
     producer.on("trackended", () => {
-      console.log("track ended");
+      log("track ended");
     });
 
     producer.on("transportclose", () => {
-      console.log("transport ended");
+      log("transport ended");
     });
   };
 
   useEffect(() => {
     return () => {
-      console.log("stopping");
+      log("stopping");
       streamRef.current?.getTracks().forEach((track) => track.stop());
+      producerTransport.current.close();
       socket.disconnect();
-      // producerTransport.close();
     };
   }, []);
 
-  return { goConsume, getLocalStream };
+  return { getLocalStream };
 };
 
 export const useReceiverStream = (
+  socket: Socket,
   remoteVideo: React.RefObject<HTMLVideoElement>
 ) => {
-  const socket = io("/mediasoup");
-  const streamRef = useRef<MediaStream>();
-  const { token } = useUserContext();
   let device: any;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let consumerTransport: any;
   let consumer: any;
   let producerId: string;
 
-  socket.on("connection-success", ({ socketId, existsProducer }) => {
-    console.log(socketId, existsProducer);
-    registerReceivingSocket({ token, socketId });
-  });
-
   const goConsume = (pId: string) => {
     producerId = pId;
-    goConnect(false);
-  };
-
-  const goConnect = (producerOrConsumer: boolean) => {
     getRtpCapabilities();
   };
 
@@ -236,10 +228,10 @@ export const useReceiverStream = (
       await device.load({
         routerRtpCapabilities: rtpCapabilities,
       });
-      console.log("Device RTP Capabilities: ", rtpCapabilities);
+      log("Device RTP Capabilities: ", rtpCapabilities);
       createRecvTransport();
     } catch (err) {
-      console.log(err);
+      log(err);
     }
   };
 
@@ -247,7 +239,7 @@ export const useReceiverStream = (
     socket.emit(
       "createRoom",
       (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
-        console.log(`rtpCapabilities: ${data.rtpCapabilities}`);
+        log(`rtpCapabilities: ${data.rtpCapabilities}`);
         rtpCapabilities = data.rtpCapabilities;
         createDevice();
       }
@@ -255,17 +247,15 @@ export const useReceiverStream = (
   };
 
   const createRecvTransport = async () => {
-    console.log("creating transport");
+    log("creating transport");
     socket.emit(
       "createWebRtcTransport",
       { sender: false },
       ({ params }: { params: any }) => {
         if (params.error) {
-          console.log(params.error);
+          log(params.error);
           return;
         }
-
-        console.log(params);
 
         consumerTransport = device.createRecvTransport(params);
 
@@ -288,15 +278,14 @@ export const useReceiverStream = (
           }
         );
 
-        console.log("transport created");
+        log("transport created");
         connectRecvTransport();
       }
     );
   };
 
   const connectRecvTransport = async () => {
-    console.log("starting connect receive transport");
-    console.log("device rtp capabilities: ", device.rtpCapabilities);
+    log("device rtp capabilities: ", device.rtpCapabilities);
     socket.emit(
       "consume",
       {
@@ -305,11 +294,11 @@ export const useReceiverStream = (
       },
       async ({ params }: { params: any }) => {
         if (params.error) {
-          console.log("Cannot Consume");
+          log("Cannot Consume");
           return;
         }
 
-        console.log(params);
+        log(params);
         consumer = await consumerTransport.consume({
           id: params.id,
           producerId: params.producerId,
@@ -325,12 +314,12 @@ export const useReceiverStream = (
           remoteVideo.current
             .play()
             .then((value) => {
-              console.log("play successful");
-              console.log(value);
+              log("play successful");
+              log(value);
             })
             .catch((error) => {
-              console.log("play returned an error");
-              console.log(error);
+              log("play returned an error");
+              log(error);
             });
         }
       }
@@ -339,8 +328,8 @@ export const useReceiverStream = (
 
   useEffect(() => {
     return () => {
-      console.log("stopping");
-      streamRef.current?.getTracks().forEach((track) => track.stop());
+      log("stopping");
+      consumerTransport?.close();
       socket.disconnect();
     };
   }, []);

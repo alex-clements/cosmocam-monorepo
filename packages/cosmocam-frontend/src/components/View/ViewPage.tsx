@@ -1,18 +1,13 @@
-import { Button } from "@mui/material";
 import { useRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { useReceiverStream } from "../../hooks/stream";
 import { ViewStream } from "./ViewStream";
-import { useEffect, useState } from "react";
-import { fetchActiveStreams } from "../../services/socket";
-import { useUserContext } from "../Context/Providers";
+import { Socket } from "socket.io-client";
 
-export const ViewPage = () => {
+export const ViewPage = ({ socket }: { socket: Socket }) => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const { goConsume } = useReceiverStream(remoteVideoRef);
-  const [producerIds, setProducerIds] = useState<string[]>([]);
-  const { token } = useUserContext();
+  const { goConsume } = useReceiverStream(socket, remoteVideoRef);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

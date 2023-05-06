@@ -3,8 +3,8 @@ import { LoginPage } from "../Login/LoginPage";
 import { RegisterPage } from "../Register/RegisterPage";
 import { Dashboard } from "../Dashboard/Dashboard";
 import { AccountPage } from "../Account/AccountPage";
-import { StreamPage } from "../Stream/StreamPage";
-import { ViewPage } from "../View/ViewPage";
+import { StreamPageWrapper } from "../Stream/StreamPageWrapper";
+import { ViewPageWrapper } from "../View/ViewPageWrapper";
 
 export const routes = {
   [pathNames.LOGIN]: { element: <LoginPage />, pagename: pageNames.LOGIN },
@@ -20,6 +20,9 @@ export const routes = {
     element: <AccountPage />,
     pagename: pageNames.ACCOUNT,
   },
-  [pathNames.STREAM]: { element: <StreamPage />, pagename: pageNames.STREAM },
-  [pathNames.VIEW]: { element: <ViewPage />, pagename: pageNames.VIEW },
+  [pathNames.STREAM]: {
+    element: <StreamPageWrapper />,
+    pagename: pageNames.STREAM,
+  },
+  [pathNames.VIEW]: { element: <ViewPageWrapper />, pagename: pageNames.VIEW },
 };

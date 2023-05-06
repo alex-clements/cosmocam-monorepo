@@ -1,8 +1,5 @@
 import { Button } from "@mui/material";
-import { useRef } from "react";
-import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
-import { useReceiverStream } from "../../hooks/stream";
 import { useEffect, useState } from "react";
 import { fetchActiveStreams } from "../../services/socket";
 import { useUserContext } from "../Context/Providers";
@@ -20,11 +17,24 @@ export const ViewStream = ({ goConsume, remoteVideoRef }) => {
 
   return (
     <>
-      {producerIds.map((id) => (
-        <Button onClick={() => goConsume(id)}>{id}</Button>
-      ))}
       <Grid item xs={12}>
-        <video autoPlay loop playsInline muted ref={remoteVideoRef}></video>
+        {producerIds.map((id) => (
+          <Button variant="contained" onClick={() => goConsume(id)}>
+            {id}
+          </Button>
+        ))}
+      </Grid>
+
+      <Grid item xs={12}>
+        <video
+          height="240px"
+          autoPlay
+          loop
+          playsInline
+          muted
+          controls
+          ref={remoteVideoRef}
+        ></video>
       </Grid>
     </>
   );
