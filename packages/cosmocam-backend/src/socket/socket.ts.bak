@@ -7,22 +7,22 @@ const mediasoup = require("mediasoup");
 
 const handleSocketDisconnect = (socket: any) => {
   console.log(`Socket Disconnected: ${socket.id}`);
-  const streamManager = StreamManagerSingleton.getStreamManager();
-  streamManager.removeSocket(socket.id);
 };
 
 export const socketSetup = (httpsServer: https.Server) => {
   const io = new Server(httpsServer);
   let streamManager = StreamManagerSingleton.getStreamManager();
-  let worker: mediasoupTypes.Worker;
 
-  const getRtpCapabilities = (socket: any, callback: ({}) => void) => {
-    const user = streamManager.getUserBySocketId(socket.id);
-    if (user) {
-      let router = user.getRouter();
-      const rtpCapabilities = router?.rtpCapabilities;
-      callback({ rtpCapabilities });
-    }
+  let worker: mediasoupTypes.Worker;
+  let router: mediasoupTypes.Router;
+  let producer: mediasoupTypes.Producer;
+  let consumer: mediasoupTypes.Consumer;
+  let producerTransport: mediasoupTypes.WebRtcTransport;
+  let consumerTransport: mediasoupTypes.WebRtcTransport;
+
+  const getRtpCapabilities = (callback: ({}) => void) => {
+    const rtpCapabilities = router.rtpCapabilities;
+    callback({ rtpCapabilities });
   };
 
   const createWorker = async (): Promise<mediasoupTypes.Worker> => {
@@ -45,7 +45,7 @@ export const socketSetup = (httpsServer: https.Server) => {
     worker = data;
   });
 
-  const createWebRtcTransport = async (socket: any, callback: any) => {
+  const createWebRtcTransport = async (callback: any) => {
     try {
       const localIPAddress: string = getLocalIPAddress();
       const webRtcTransport_options = {
@@ -54,11 +54,6 @@ export const socketSetup = (httpsServer: https.Server) => {
         enableTcp: true,
         preferUdp: true,
       };
-      let router = streamManager.getUserBySocketId(socket.id)?.getRouter();
-      if (!router) {
-        log("Router not found in createWebRtcTransport");
-        return;
-      }
       let transport = await router.createWebRtcTransport(
         webRtcTransport_options
       );
@@ -101,77 +96,47 @@ export const socketSetup = (httpsServer: https.Server) => {
     socket.on("disconnect", () => handleSocketDisconnect(socket));
 
     socket.on("createRoom", async (callback) => {
-      const user = streamManager.getUserBySocketId(socket.id);
-      if (user) {
-        let router = user.getRouter();
-        if (router === undefined) {
-          log("New Router Created");
-          router = await worker.createRouter({ mediaCodecs });
-          log(`Router ID: ${router.id}`);
-          user.assignRouter(router);
-        }
+      if (router === undefined) {
+        log("New Router Created");
+        router = await worker.createRouter({ mediaCodecs });
+        log(`Router ID: ${router.id}`);
       }
 
-      getRtpCapabilities(socket, callback);
+      getRtpCapabilities(callback);
     });
 
     socket.on("getRtpCapabilities", (callback) => {
-      let router = streamManager.getUserBySocketId(socket.id)?.getRouter();
-      if (!router) {
-        log("Router not found in getRptCapabilities");
-        return;
-      }
-      const rtpCapabilities = router.rtpCapabilities;
+      const rtpCapabilities = router?.rtpCapabilities;
       log("rtpCapabilities", rtpCapabilities);
       callback({ rtpCapabilities });
     });
 
     socket.on("createWebRtcTransport", async ({ sender }, callback) => {
       log(`Is this a sender request? ${sender}`);
-      const user = streamManager.getUserBySocketId(socket.id);
-      if (!user) return;
-
       if (sender) {
-        let sendingSocket = user.getSendingSocket(socket.id);
-        let producerTransport = (await createWebRtcTransport(
-          socket,
+        producerTransport = (await createWebRtcTransport(
           callback
         )) as mediasoupTypes.WebRtcTransport;
-        sendingSocket?.assignProducerTransport(producerTransport);
       } else {
-        let receivingSocket = user.getReceivingSocket(socket.id);
-        let consumerTransport = (await createWebRtcTransport(
-          socket,
+        consumerTransport = (await createWebRtcTransport(
           callback
         )) as mediasoupTypes.WebRtcTransport;
-        receivingSocket?.assignConsumerTransport(consumerTransport);
       }
     });
 
     socket.on("transport-connect", async ({ dtlsParameters }) => {
       log("DTLS PARAMS...", { dtlsParameters });
-      let producerTransport = streamManager
-        .getUserBySocketId(socket.id)
-        ?.getSendingSocket(socket.id)
-        ?.getProducerTransport();
       await producerTransport?.connect({ dtlsParameters });
     });
 
     socket.on(
       "transport-produce",
       async ({ kind, rtpParameters, appData }, callback) => {
-        let producerTransport = streamManager
-          .getUserBySocketId(socket.id)
-          ?.getSendingSocket(socket.id)
-          ?.getProducerTransport();
-        let producer = (await producerTransport?.produce({
+        producer = (await producerTransport?.produce({
           kind,
           rtpParameters,
         })) as mediasoupTypes.Producer;
-        streamManager
-          .getUserBySocketId(socket.id)
-          ?.getSendingSocket(socket.id)
-          ?.assignProducer(producer);
+
         log("Producer ID: ", producer.id, producer.kind);
 
         producerTransport?.on("@producerclose", () => {
@@ -185,39 +150,18 @@ export const socketSetup = (httpsServer: https.Server) => {
 
     socket.on("transport-recv-connect", async ({ dtlsParameters }) => {
       log(`DTLS PARAMS: ${dtlsParameters}`);
-      let consumerTransport = streamManager
-        .getUserBySocketId(socket.id)
-        ?.getReceivingSocket(socket.id)
-        ?.getConsumerTransport();
       await consumerTransport?.connect({ dtlsParameters });
     });
 
-    socket.on("consume", async ({ rtpCapabilities, producerId }, callback) => {
+    socket.on("consume", async ({ rtpCapabilities }, callback) => {
       try {
         log("starting consume");
-        let router = streamManager.getUserBySocketId(socket.id)?.getRouter();
-        if (!router) {
-          log("Router not found in consume");
-          return;
-        }
-
-        log(`consume producerId: ${producerId}`);
-
-        if (router.canConsume({ producerId, rtpCapabilities })) {
-          let consumerTransport = streamManager
-            .getUserBySocketId(socket.id)
-            ?.getReceivingSocket(socket.id)
-            ?.getConsumerTransport();
-          let consumer = (await consumerTransport?.consume({
-            producerId,
+        if (router.canConsume({ producerId: producer.id, rtpCapabilities })) {
+          consumer = (await consumerTransport?.consume({
+            producerId: producer.id,
             rtpCapabilities,
             paused: true,
           })) as mediasoupTypes.Consumer;
-
-          if (!consumer) {
-            log("consumer is undefined");
-            return;
-          }
 
           consumer.on("transportclose", () => {
             log("transport close from consumer");
@@ -229,15 +173,10 @@ export const socketSetup = (httpsServer: https.Server) => {
 
           const params = {
             id: consumer.id,
-            producerId,
+            producerId: producer.id,
             kind: consumer.kind,
             rtpParameters: consumer.rtpParameters,
           };
-
-          streamManager
-            .getUserBySocketId(socket.id)
-            ?.getReceivingSocket(socket.id)
-            ?.assignConsumer(consumer);
 
           callback({ params });
         } else {
@@ -255,11 +194,7 @@ export const socketSetup = (httpsServer: https.Server) => {
 
     socket.on("consumer-resume", async () => {
       log("consumer resume");
-      let consumer = streamManager
-        .getUserBySocketId(socket.id)
-        ?.getReceivingSocket(socket.id)
-        ?.getConsumer();
-      await consumer?.resume();
+      await consumer.resume();
     });
   });
 };

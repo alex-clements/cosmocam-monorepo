@@ -4,6 +4,9 @@ export enum apis {
   AUTHENTICATE_TOKEN = "/authenticate/token",
   LOGOUT = "/authenticate/logout",
   UPDATE_USER = "/users/update",
+  REGISTER_SENDING_SOCKET = "/streamManager/registerSendingSocket",
+  REGISTER_RECEIVING_SOCKET = "/streamManager/registerReceivingSocket",
+  GET_ACTIVE_STREAMS = "/streamManager/activeStreams",
 }
 
 export enum pathNames {

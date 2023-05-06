@@ -1,36 +1,76 @@
-import { Stream } from "./Stream";
-import { Viewer } from "./Viewer";
+import { SendingSocket } from "./SendingSocket";
+import { ReceivingSocket } from "./ReceivingSocket";
+import { types as mediasoupTypes } from "mediasoup";
+import { createLogger } from "./util";
+const mediasoup = require("mediasoup");
+
+const LOGGING = false;
+const log = createLogger(LOGGING);
 
 export class User {
   private email: string;
-  private streams: Stream[];
-  private viewers: Viewer[];
+  private sendingSockets: SendingSocket[];
+  private receivingSockets: ReceivingSocket[];
+  private router: mediasoupTypes.Router | undefined;
 
   constructor(email: string) {
     this.email = email;
-    this.streams = [];
-    this.viewers = [];
+    this.sendingSockets = [];
+    this.receivingSockets = [];
+  }
+
+  assignRouter(router: mediasoupTypes.Router) {
+    this.router = router;
+  }
+
+  getRouter(): mediasoupTypes.Router | undefined {
+    return this.router;
   }
 
   getEmail(): string {
     return this.email;
   }
 
-  addStream(stream: Stream) {
-    this.streams.push(stream);
+  addSendingSocket(socketId: string) {
+    const sendingSocket = new SendingSocket(socketId);
+    this.sendingSockets.push(sendingSocket);
   }
 
-  removeStream(stream: Stream) {
-    let index = this.streams.findIndex((el) => el.getId() == stream.getId());
-    this.streams.splice(index, 1);
+  getSendingSocket(socketId: string) {
+    return this.sendingSockets.find((el) => el.getId() === socketId);
   }
 
-  addViewer(viewer: Viewer): void {
-    this.viewers.push(viewer);
+  addReceivingSocket(socketId: string): void {
+    const receivingSocket = new ReceivingSocket(socketId);
+    this.receivingSockets.push(receivingSocket);
   }
 
-  removeViewer(viewer: Viewer): void {
-    let index = this.viewers.findIndex((el) => el.getId() === viewer.getId());
-    this.viewers.splice(index, 1);
+  getReceivingSocket(socketId: string) {
+    return this.receivingSockets.find((el) => el.getId() === socketId);
+  }
+
+  removeSocket(socketId: string) {
+    let index = this.sendingSockets.findIndex((el) => el.getId() === socketId);
+    if (index > -1) {
+      this.sendingSockets.splice(index, 1);
+      log(`User.removeSocket removing sending socket at index ${index}`);
+      return;
+    }
+    index = this.receivingSockets.findIndex((el) => el.getId() === socketId);
+    this.receivingSockets.splice(index, 1);
+    log(`User.removeSocket removing receiving socket at index: ${index}`);
+    return;
+  }
+
+  getActiveStreams() {
+    const activeStreams = [];
+
+    for (let socket of this.sendingSockets) {
+      if (socket.getProducer()?.id) {
+        activeStreams.push(socket.getProducer()?.id);
+      }
+    }
+
+    return activeStreams;
   }
 }

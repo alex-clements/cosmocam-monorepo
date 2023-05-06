@@ -1,6 +1,7 @@
 import express from "express";
 import userRouter from "./src/routes/user.router";
 import authenticationRouter from "./src/routes/authentication.router";
+import streamManagerRouter from "./src/routes/streamManager.router";
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
@@ -13,6 +14,7 @@ const port = 3001;
 app.use(express.json());
 app.use("/users", userRouter);
 app.use("/authenticate", authenticationRouter);
+app.use("/streamManager", streamManagerRouter);
 
 app.use(express.static("public"));
 app.use(

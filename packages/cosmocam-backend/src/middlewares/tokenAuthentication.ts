@@ -10,11 +10,11 @@ const authenticateAccessToken = (req: any, res: any, next: any) => {
     token,
     process.env.TOKEN_SECRET as string,
     (err: any, user: any) => {
-      console.log(err);
+      // console.log(err);
 
       if (err) return res.sendStatus(403);
 
-      req.user = user;
+      req.body.user = user;
 
       next();
     }
