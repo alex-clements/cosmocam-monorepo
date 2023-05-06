@@ -211,13 +211,21 @@ export const useReceiverStream = (
   socket: Socket,
   remoteVideo: React.RefObject<HTMLVideoElement>
 ) => {
-  let device: any;
+  let device: mediasoupTypes.Device;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
-  let consumerTransport: any;
-  let consumer: any;
+  let consumerTransport = useRef<mediasoupTypes.Transport>();
+  let consumer = useRef<mediasoupTypes.Consumer>();
   let producerId: string;
 
   const goConsume = (pId: string) => {
+    if (consumer.current) {
+      consumer.current.close();
+      consumer.current = undefined;
+    }
+    if (consumerTransport.current) {
+      consumerTransport.current.close();
+      consumerTransport.current = undefined;
+    }
     producerId = pId;
     getRtpCapabilities();
   };
@@ -257,9 +265,9 @@ export const useReceiverStream = (
           return;
         }
 
-        consumerTransport = device.createRecvTransport(params);
+        consumerTransport.current = device.createRecvTransport(params);
 
-        consumerTransport.on(
+        consumerTransport.current.on(
           "connect",
           async (
             { dtlsParameters }: { dtlsParameters: any },
@@ -299,14 +307,14 @@ export const useReceiverStream = (
         }
 
         log(params);
-        consumer = await consumerTransport.consume({
+        consumer.current = await consumerTransport.current?.consume({
           id: params.id,
           producerId: params.producerId,
           kind: params.kind,
           rtpParameters: params.rtpParameters,
         });
 
-        const { track } = consumer;
+        const { track } = consumer.current as mediasoupTypes.Consumer;
 
         if (remoteVideo.current) {
           remoteVideo.current.srcObject = new MediaStream([track]);
@@ -329,7 +337,7 @@ export const useReceiverStream = (
   useEffect(() => {
     return () => {
       log("stopping");
-      consumerTransport?.close();
+      consumerTransport.current?.close();
       socket.disconnect();
     };
   }, []);
