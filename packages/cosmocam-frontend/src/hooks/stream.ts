@@ -4,7 +4,7 @@ import { types as mediasoupTypes } from "mediasoup-client";
 import { createLogger } from "@cosmocam/shared";
 const mediasoupClient = require("mediasoup-client");
 
-const loggingEnabled = true;
+const loggingEnabled = false;
 const log = createLogger(loggingEnabled, "Frontend Stream File:");
 
 let params: any = {

@@ -5,7 +5,11 @@ import { useReceiverStream } from "../../hooks/stream";
 import { ViewStream } from "./ViewStream";
 import { Socket } from "socket.io-client";
 
-export const ViewPage = ({ socket }: { socket: Socket }) => {
+interface ViewPageProps {
+  socket: Socket;
+}
+
+export const ViewPage = ({ socket }: ViewPageProps) => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const { goConsume, fetchProducerId } = useReceiverStream(
     socket,

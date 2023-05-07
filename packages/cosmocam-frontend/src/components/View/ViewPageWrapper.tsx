@@ -7,7 +7,6 @@ import { registerReceivingSocket } from "../../services/socket";
 export const ViewPageWrapper = () => {
   const [socketSet, setSocketSet] = useState(false);
   const socket = useRef<Socket>();
-  const producerId = useRef<string>("");
   const { token } = useUserContext();
 
   useEffect(() => {

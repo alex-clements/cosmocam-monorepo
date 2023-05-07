@@ -2,11 +2,15 @@ import https from "https";
 import { Server } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
 import { StreamManagerSingleton } from "../models/StreamManager/StreamManagerSingleton";
-import { getLocalIPAddress, log, mediaCodecs } from "./util";
+import { getLocalIPAddress, mediaCodecs } from "./util";
+import { createLogger } from "@cosmocam/shared";
 const mediasoup = require("mediasoup");
 
+const loggingEnabled = false;
+const log = createLogger(loggingEnabled, "Socket file:");
+
 const handleSocketDisconnect = (socket: any) => {
-  console.log(`Socket Disconnected: ${socket.id}`);
+  log(`Socket Disconnected: ${socket.id}`);
   const streamManager = StreamManagerSingleton.getStreamManager();
   streamManager.removeSocket(socket.id);
 };

@@ -10,11 +10,11 @@ export const AccountPage = ({}: AccountPageProps) => {
     <Fragment>
       <Box sx={{ paddingTop: 5, flexGrow: 1 }}>
         <Grid container spacing={2}>
-          <Grid item md={4} xs={1}></Grid>
-          <Grid item md={4} xs={10}>
+          <Grid item md={4} xl={5} xs={1}></Grid>
+          <Grid item md={4} xl={2} xs={10}>
             <AccountForm />
           </Grid>
-          <Grid item md={4} xs={1}></Grid>
+          <Grid item md={4} xl={5} xs={1}></Grid>
         </Grid>
       </Box>
     </Fragment>

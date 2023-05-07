@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { useProducerStream } from "../../hooks/stream";
 import { VideoDeviceSelect } from "./VideoDeviceSelect";
-import { Button } from "@mui/material";
 import { useGetVideo } from "../../hooks/video";
 
 export const StreamPage = ({ socket, streaming }) => {
@@ -70,7 +69,6 @@ export const StreamPage = ({ socket, streaming }) => {
           <VideoDeviceSelect setActiveDevice={setActiveDevice} />
         </Grid>
         <Grid item xs={12} sm={5}></Grid>
-        <Button onClick={startStream}>start stream</Button>
       </Grid>
     </Box>
   );

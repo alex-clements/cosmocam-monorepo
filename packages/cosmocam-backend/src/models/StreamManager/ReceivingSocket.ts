@@ -3,7 +3,7 @@ import { Socket } from "socket.io";
 import { SendingSocket } from "./SendingSocket";
 import { createLogger } from "@cosmocam/shared";
 
-const loggingEnabled = true;
+const loggingEnabled = false;
 const log = createLogger(loggingEnabled, "Receiving Socket File: ");
 
 export class ReceivingSocket {
