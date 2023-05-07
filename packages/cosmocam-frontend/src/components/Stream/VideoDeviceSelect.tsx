@@ -6,6 +6,7 @@ import {
   SelectChangeEvent,
 } from "@mui/material";
 import { useState, Fragment } from "react";
+import { CssFormControl } from "../SharedComponents/SharedComponents";
 
 export const VideoDeviceSelect = ({ setActiveDevice }) => {
   const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
@@ -27,14 +28,17 @@ export const VideoDeviceSelect = ({ setActiveDevice }) => {
   return (
     <Fragment>
       {deviceList.length !== 0 && (
-        <FormControl fullWidth>
-          <InputLabel id="device-select-label">Device</InputLabel>
+        <CssFormControl fullWidth>
+          <InputLabel id="device-select-label" sx={{ color: "white" }}>
+            Device
+          </InputLabel>
           <Select
             labelId="device-select-label"
             id="device-select"
             value={selectedDevice}
             label="Device"
             onChange={handleChange}
+            sx={{ borderColor: "white", color: "white" }}
           >
             {deviceList?.map((device) => (
               <MenuItem key={device.deviceId} value={device.deviceId}>
@@ -42,7 +46,7 @@ export const VideoDeviceSelect = ({ setActiveDevice }) => {
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </CssFormControl>
       )}
     </Fragment>
   );

@@ -94,8 +94,26 @@ export const socketSetup = (httpsServer: https.Server) => {
 
   peers.on("connection", async (socket) => {
     log(`socket connected: ${socket.id}`);
+    streamManager.registerSocket(socket);
     socket.emit("connection-success", {
       socketId: socket.id,
+    });
+
+    socket.on("startProducer", async ({ producerSocketId }, callback) => {
+      const user = streamManager.getUserBySocketId(socket.id);
+
+      if (!user) {
+        return;
+      }
+
+      const sendingSocket = user.getSendingSocket(producerSocketId);
+      const receivingSocket = user.getReceivingSocket(socket.id);
+
+      if (!sendingSocket || !receivingSocket) {
+        return;
+      }
+
+      receivingSocket.assignToSendingSocket(sendingSocket, callback);
     });
 
     socket.on("disconnect", () => handleSocketDisconnect(socket));

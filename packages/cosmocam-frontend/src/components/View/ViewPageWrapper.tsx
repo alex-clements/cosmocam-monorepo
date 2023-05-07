@@ -7,6 +7,7 @@ import { registerReceivingSocket } from "../../services/socket";
 export const ViewPageWrapper = () => {
   const [socketSet, setSocketSet] = useState(false);
   const socket = useRef<Socket>();
+  const producerId = useRef<string>("");
   const { token } = useUserContext();
 
   useEffect(() => {
@@ -18,16 +19,15 @@ export const ViewPageWrapper = () => {
         ({ socketId, existsProducer }) => {
           console.log(socketId, existsProducer);
           registerReceivingSocket({ token, socketId });
+          setSocketSet(true);
         }
       );
-
-      setSocketSet(true);
     }
   }, []);
 
   return (
     <Fragment>
-      {socket.current && <ViewPage socket={socket.current} />}
+      {socketSet && socket.current && <ViewPage socket={socket.current} />}
     </Fragment>
   );
 };

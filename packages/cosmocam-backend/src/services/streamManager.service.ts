@@ -27,8 +27,13 @@ const getActiveStreams = (body: any) => {
   const username = body.user.username;
 
   const user = streamManager.getUser(username);
-  const activeStreams = user?.getActiveStreams();
-  return { streams: activeStreams };
+
+  if (user) {
+    const { producerIds, socketIds } = user?.getActiveStreams();
+    return { streams: producerIds, sockets: socketIds };
+  } else {
+    throw new Error("User Not Found");
+  }
 };
 
 export const streamManagerService = {
