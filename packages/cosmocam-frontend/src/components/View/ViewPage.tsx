@@ -5,16 +5,27 @@ import { useReceiverStream } from "../../hooks/stream";
 import { ViewStream } from "./ViewStream";
 import { Socket } from "socket.io-client";
 
-export const ViewPage = ({ socket }: { socket: Socket }) => {
+interface ViewPageProps {
+  socket: Socket;
+}
+
+export const ViewPage = ({ socket }: ViewPageProps) => {
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const { goConsume } = useReceiverStream(socket, remoteVideoRef);
+  const { goConsume, fetchProducerId } = useReceiverStream(
+    socket,
+    remoteVideoRef
+  );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1} sx={{ marginTop: 1 }}>
         <Grid item xs={12}></Grid>
 
-        <ViewStream goConsume={goConsume} remoteVideoRef={remoteVideoRef} />
+        <ViewStream
+          goConsume={goConsume}
+          fetchProducerId={fetchProducerId}
+          remoteVideoRef={remoteVideoRef}
+        />
       </Grid>
     </Box>
   );

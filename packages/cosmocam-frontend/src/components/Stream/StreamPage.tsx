@@ -1,17 +1,55 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { useProducerStream } from "../../hooks/stream";
 import { VideoDeviceSelect } from "./VideoDeviceSelect";
+import { useGetVideo } from "../../hooks/video";
 
-export const StreamPage = ({ socket }) => {
+export const StreamPage = ({ socket, streaming }) => {
   const localVideo = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream>();
   const [activeDevice, setActiveDevice] = useState<string>("");
-  useProducerStream({
+  console.log("streaming: ", streaming);
+
+  const { startStream, endStream } = useProducerStream({
     socket,
-    localVideo,
-    deviceId: activeDevice,
+    streamRef,
+    activeDevice,
   });
+
+  const { getLocalStream } = useGetVideo({ deviceId: activeDevice });
+
+  const streamSuccess = (stream: MediaStream) => {
+    streamRef.current = stream;
+
+    if (localVideo.current) {
+      localVideo.current.srcObject = stream;
+      localVideo.current.play();
+    }
+
+    if (streaming) startStream();
+  };
+
+  useEffect(() => {
+    stopVideo();
+    getLocalStream().then((stream) => streamSuccess(stream));
+  }, [activeDevice]);
+
+  useEffect(() => {
+    if (streaming) {
+      startStream();
+    } else {
+      endStream();
+    }
+  }, [streaming]);
+
+  useEffect(() => {
+    return () => stopVideo();
+  }, []);
+
+  const stopVideo = () => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+  };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
@@ -26,9 +64,11 @@ export const StreamPage = ({ socket }) => {
             ref={localVideo}
           ></video>
         </Grid>
-        <Grid item xs={12} sm={3}>
+        <Grid item xs={12} sm={5}></Grid>
+        <Grid item xs={12} sm={2}>
           <VideoDeviceSelect setActiveDevice={setActiveDevice} />
         </Grid>
+        <Grid item xs={12} sm={5}></Grid>
       </Grid>
     </Box>
   );

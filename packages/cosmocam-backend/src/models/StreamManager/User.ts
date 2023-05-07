@@ -1,11 +1,12 @@
 import { SendingSocket } from "./SendingSocket";
 import { ReceivingSocket } from "./ReceivingSocket";
 import { types as mediasoupTypes } from "mediasoup";
-import { createLogger } from "./util";
+import { createLogger } from "@cosmocam/shared";
+import { Socket } from "socket.io";
 const mediasoup = require("mediasoup");
 
 const LOGGING = false;
-const log = createLogger(LOGGING);
+const log = createLogger(LOGGING, "User File:");
 
 export class User {
   private email: string;
@@ -31,8 +32,8 @@ export class User {
     return this.email;
   }
 
-  addSendingSocket(socketId: string) {
-    const sendingSocket = new SendingSocket(socketId);
+  addSendingSocket(socketId: string, socket: Socket) {
+    const sendingSocket = new SendingSocket(socket);
     this.sendingSockets.push(sendingSocket);
   }
 
@@ -40,8 +41,8 @@ export class User {
     return this.sendingSockets.find((el) => el.getId() === socketId);
   }
 
-  addReceivingSocket(socketId: string): void {
-    const receivingSocket = new ReceivingSocket(socketId);
+  addReceivingSocket(socketId: string, socket: Socket): void {
+    const receivingSocket = new ReceivingSocket(socket);
     this.receivingSockets.push(receivingSocket);
   }
 
@@ -52,25 +53,44 @@ export class User {
   removeSocket(socketId: string) {
     let index = this.sendingSockets.findIndex((el) => el.getId() === socketId);
     if (index > -1) {
-      this.sendingSockets.splice(index, 1);
-      log(`User.removeSocket removing sending socket at index ${index}`);
+      this.removeSendingSocket(socketId, index);
       return;
     }
     index = this.receivingSockets.findIndex((el) => el.getId() === socketId);
-    this.receivingSockets.splice(index, 1);
-    log(`User.removeSocket removing receiving socket at index: ${index}`);
+    if (index > -1) {
+      this.removeReceivingSocket(socketId, index);
+    }
     return;
   }
 
+  private removeSendingSocket(socketId: string, index: number) {
+    const sendingSocket: SendingSocket = this.sendingSockets[index];
+    sendingSocket.destroy();
+    this.sendingSockets.splice(index, 1);
+    log(`User.removeSocket removing sending socket at index ${index}`);
+  }
+
+  private removeReceivingSocket(socketId: string, index: number) {
+    const receivingSocket: ReceivingSocket = this.receivingSockets[index];
+    receivingSocket.destroy();
+    this.receivingSockets.splice(index, 1);
+    log(`User.removeSocket removing receiving socket at index: ${index}`);
+  }
+
   getActiveStreams() {
-    const activeStreams = [];
+    const producerIds = [];
+    const socketIds = [];
 
     for (let socket of this.sendingSockets) {
       if (socket.getProducer()?.id) {
-        activeStreams.push(socket.getProducer()?.id);
+        producerIds.push(socket.getProducer()?.id);
       }
     }
 
-    return activeStreams;
+    for (let socket of this.sendingSockets) {
+      socketIds.push(socket.getId());
+    }
+
+    return { producerIds, socketIds };
   }
 }

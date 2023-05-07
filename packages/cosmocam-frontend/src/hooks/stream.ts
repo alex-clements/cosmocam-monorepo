@@ -5,7 +5,7 @@ import { createLogger } from "@cosmocam/shared";
 const mediasoupClient = require("mediasoup-client");
 
 const loggingEnabled = false;
-const log = createLogger(loggingEnabled);
+const log = createLogger(loggingEnabled, "Frontend Stream File:");
 
 let params: any = {
   encoding: [
@@ -28,18 +28,18 @@ let params: any = {
   codecOptions: {
     videoGoogleStartBitrate: 1000,
   },
+  stopTracks: false,
 };
 
 export const useProducerStream = ({
   socket,
-  localVideo,
-  deviceId,
+  streamRef,
+  activeDevice,
 }: {
   socket: Socket;
-  localVideo: React.RefObject<HTMLVideoElement>;
-  deviceId: string;
+  streamRef: React.MutableRefObject<MediaStream | undefined>;
+  activeDevice: string;
 }) => {
-  const streamRef = useRef<MediaStream>();
   let device: any;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport = useRef<any>();
@@ -50,48 +50,15 @@ export const useProducerStream = ({
       producerTransport.current.close();
       producerTransport.current = undefined;
     }
-    streamRef.current?.getTracks().forEach((track) => track.stop());
-    getLocalStream(deviceId);
-  }, [deviceId]);
+  }, [activeDevice]);
 
-  const streamSuccess = (stream: MediaStream) => {
-    streamRef.current = stream;
-    if (localVideo.current) {
-      localVideo.current.srcObject = stream;
-      localVideo.current.play();
-    }
-    const videoTrack = stream.getVideoTracks()[0];
+  const startStream = () => {
+    const videoTrack = streamRef.current?.getVideoTracks()[0];
     params = {
       ...params,
       track: videoTrack,
     };
     getRtpCapabilities();
-  };
-
-  const getLocalStream = (deviceId: string) => {
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: true,
-        video: {
-          ...(deviceId && {
-            deviceId: {
-              exact: deviceId,
-            },
-          }),
-          width: {
-            min: 640,
-            max: 1920,
-          },
-          height: {
-            min: 400,
-            max: 1080,
-          },
-        },
-      })
-      .then((stream) => streamSuccess(stream))
-      .catch((error) => {
-        log(error);
-      });
   };
 
   const createDevice = async () => {
@@ -195,16 +162,22 @@ export const useProducerStream = ({
     });
   };
 
+  const endStream = () => {
+    producer?.close();
+    producer = undefined;
+    producerTransport.current?.close();
+    producerTransport.current = undefined;
+  };
+
   useEffect(() => {
     return () => {
       log("stopping");
-      streamRef.current?.getTracks().forEach((track) => track.stop());
-      producerTransport.current.close();
-      socket.disconnect();
+      producerTransport.current?.close();
+      socket?.disconnect();
     };
   }, []);
 
-  return { getLocalStream };
+  return { startStream, endStream };
 };
 
 export const useReceiverStream = (
@@ -216,6 +189,18 @@ export const useReceiverStream = (
   let consumerTransport = useRef<mediasoupTypes.Transport>();
   let consumer = useRef<mediasoupTypes.Consumer>();
   let producerId: string;
+
+  const fetchProducerId = (socketId: string) => {
+    log("fetching producer Id");
+    socket.emit(
+      "startProducer",
+      { producerSocketId: socketId },
+      ({ producerId }) => {
+        console.log("producer id received: ", producerId);
+        goConsume(producerId);
+      }
+    );
+  };
 
   const goConsume = (pId: string) => {
     if (consumer.current) {
@@ -230,6 +215,17 @@ export const useReceiverStream = (
     getRtpCapabilities();
   };
 
+  const getRtpCapabilities = () => {
+    socket.emit(
+      "createRoom",
+      (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
+        log(`rtpCapabilities: ${data.rtpCapabilities}`);
+        rtpCapabilities = data.rtpCapabilities;
+        createDevice();
+      }
+    );
+  };
+
   const createDevice = async () => {
     try {
       device = new mediasoupClient.Device();
@@ -241,17 +237,6 @@ export const useReceiverStream = (
     } catch (err) {
       log(err);
     }
-  };
-
-  const getRtpCapabilities = () => {
-    socket.emit(
-      "createRoom",
-      (data: { rtpCapabilities: mediasoupTypes.RtpCapabilities }) => {
-        log(`rtpCapabilities: ${data.rtpCapabilities}`);
-        rtpCapabilities = data.rtpCapabilities;
-        createDevice();
-      }
-    );
   };
 
   const createRecvTransport = async () => {
@@ -338,9 +323,9 @@ export const useReceiverStream = (
     return () => {
       log("stopping");
       consumerTransport.current?.close();
-      socket.disconnect();
+      socket?.disconnect();
     };
   }, []);
 
-  return { goConsume };
+  return { goConsume, fetchProducerId };
 };

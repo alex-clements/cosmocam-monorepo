@@ -18,16 +18,15 @@ export const ViewPageWrapper = () => {
         ({ socketId, existsProducer }) => {
           console.log(socketId, existsProducer);
           registerReceivingSocket({ token, socketId });
+          setSocketSet(true);
         }
       );
-
-      setSocketSet(true);
     }
   }, []);
 
   return (
     <Fragment>
-      {socket.current && <ViewPage socket={socket.current} />}
+      {socketSet && socket.current && <ViewPage socket={socket.current} />}
     </Fragment>
   );
 };

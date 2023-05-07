@@ -4,22 +4,31 @@ import { useEffect, useState } from "react";
 import { fetchActiveStreams } from "../../services/socket";
 import { useUserContext } from "../Context/Providers";
 
-export const ViewStream = ({ goConsume, remoteVideoRef }) => {
-  const [producerIds, setProducerIds] = useState<string[]>([]);
+interface ViewStreamProps {
+  goConsume: any;
+  fetchProducerId: any;
+  remoteVideoRef: React.RefObject<HTMLVideoElement>;
+}
+
+export const ViewStream = ({
+  goConsume,
+  fetchProducerId,
+  remoteVideoRef,
+}: ViewStreamProps) => {
+  const [producerSocketIds, setProducerSocketIds] = useState<string[]>([]);
   const { token } = useUserContext();
 
   useEffect(() => {
     fetchActiveStreams({ token }).then((response) => {
-      console.log(`producer ids: `, response.data.streams);
-      setProducerIds(response.data.streams);
+      setProducerSocketIds(response.data.sockets);
     });
   }, []);
 
   return (
     <>
       <Grid item xs={12}>
-        {producerIds.map((id) => (
-          <Button variant="contained" onClick={() => goConsume(id)}>
+        {producerSocketIds.map((id) => (
+          <Button variant="contained" onClick={() => fetchProducerId(id)}>
             {id}
           </Button>
         ))}

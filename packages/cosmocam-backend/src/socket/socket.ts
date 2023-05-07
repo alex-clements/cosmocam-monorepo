@@ -2,11 +2,15 @@ import https from "https";
 import { Server } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
 import { StreamManagerSingleton } from "../models/StreamManager/StreamManagerSingleton";
-import { getLocalIPAddress, log, mediaCodecs } from "./util";
+import { getLocalIPAddress, mediaCodecs } from "./util";
+import { createLogger } from "@cosmocam/shared";
 const mediasoup = require("mediasoup");
 
+const loggingEnabled = false;
+const log = createLogger(loggingEnabled, "Socket file:");
+
 const handleSocketDisconnect = (socket: any) => {
-  console.log(`Socket Disconnected: ${socket.id}`);
+  log(`Socket Disconnected: ${socket.id}`);
   const streamManager = StreamManagerSingleton.getStreamManager();
   streamManager.removeSocket(socket.id);
 };
@@ -94,8 +98,26 @@ export const socketSetup = (httpsServer: https.Server) => {
 
   peers.on("connection", async (socket) => {
     log(`socket connected: ${socket.id}`);
+    streamManager.registerSocket(socket);
     socket.emit("connection-success", {
       socketId: socket.id,
+    });
+
+    socket.on("startProducer", async ({ producerSocketId }, callback) => {
+      const user = streamManager.getUserBySocketId(socket.id);
+
+      if (!user) {
+        return;
+      }
+
+      const sendingSocket = user.getSendingSocket(producerSocketId);
+      const receivingSocket = user.getReceivingSocket(socket.id);
+
+      if (!sendingSocket || !receivingSocket) {
+        return;
+      }
+
+      receivingSocket.assignToSendingSocket(sendingSocket, callback);
     });
 
     socket.on("disconnect", () => handleSocketDisconnect(socket));
