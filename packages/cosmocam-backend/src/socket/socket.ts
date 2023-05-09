@@ -3,11 +3,10 @@ import { Server } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
 import { StreamManagerSingleton } from "../models/StreamManager/StreamManagerSingleton";
 import { getLocalIPAddress, mediaCodecs } from "./util";
-import { createLogger } from "@cosmocam/shared";
+import { createLogger, loggingFiles } from "@cosmocam/shared";
 const mediasoup = require("mediasoup");
 
-const loggingEnabled = false;
-const log = createLogger(loggingEnabled, "Socket file:");
+const log = createLogger(!!loggingFiles.BACKEND_SOCKET, "Socket file:");
 
 const handleSocketDisconnect = (socket: any) => {
   log(`Socket Disconnected: ${socket.id}`);

@@ -70,3 +70,12 @@ export enum labels {
   ACCOUNT = "account",
   LOGOUT = "logout",
 }
+
+export enum loggingFiles {
+  FRONTEND_STREAM = 0,
+  SENDING_SOCKET = 0,
+  RECEIVING_SOCKET = 0,
+  BACKEND_SOCKET = 0,
+  STREAM_MANAGER = 0,
+  USER = 0,
+}

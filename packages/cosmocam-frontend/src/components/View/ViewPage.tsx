@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid";
 import { useReceiverStream } from "../../hooks/stream";
 import { ViewStream } from "./ViewStream";
 import { Socket } from "socket.io-client";
+import { Container } from "@mui/material";
 
 interface ViewPageProps {
   socket: Socket;
@@ -18,15 +19,15 @@ export const ViewPage = ({ socket }: ViewPageProps) => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={1} sx={{ marginTop: 1 }}>
-        <Grid item xs={12}></Grid>
-
-        <ViewStream
-          goConsume={goConsume}
-          fetchProducerId={fetchProducerId}
-          remoteVideoRef={remoteVideoRef}
-        />
-      </Grid>
+      <Container maxWidth="xl">
+        <Grid container spacing={1} sx={{ marginTop: 1 }}>
+          <ViewStream
+            goConsume={goConsume}
+            fetchProducerId={fetchProducerId}
+            remoteVideoRef={remoteVideoRef}
+          />
+        </Grid>
+      </Container>
     </Box>
   );
 };

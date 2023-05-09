@@ -1,10 +1,9 @@
 import { types as mediasoupTypes } from "mediasoup";
 import { Socket } from "socket.io";
 import { ReceivingSocket } from "./ReceivingSocket";
-import { createLogger } from "@cosmocam/shared";
+import { createLogger, loggingFiles } from "@cosmocam/shared";
 
-const loggingEnabled = false;
-const log = createLogger(loggingEnabled, "SendingSocket File:");
+const log = createLogger(!!loggingFiles.SENDING_SOCKET, "SendingSocket File:");
 
 export class SendingSocket {
   private id: string;
@@ -17,6 +16,7 @@ export class SendingSocket {
     this.id = socket.id;
     this.socket = socket;
     this.viewers = [];
+    log(`socket ${this.id} created`);
   }
 
   assignProducer(producer: mediasoupTypes.Producer) {
@@ -47,7 +47,10 @@ export class SendingSocket {
   }
 
   public addViewer(receivingSocket: ReceivingSocket) {
-    log("received a viewer!");
+    log(`socket ${this.id} received a viewer`);
+    if (this.viewers.length === 0) {
+      log(`socket ${this.id} turned on`);
+    }
     this.viewers.push(receivingSocket);
     if (this.viewers.length >= 1) {
       this.socket?.emit("viewer-added");
@@ -63,6 +66,7 @@ export class SendingSocket {
     );
     this.viewers.splice(index, 1);
     if (this.viewers.length <= 0) {
+      log(`socket ${this.id} turned off`);
       this.socket?.emit("no-more-viewers");
       this.producer?.close();
       this.producerTransport?.close();
@@ -77,6 +81,6 @@ export class SendingSocket {
     );
     this.producer?.close();
     this.producerTransport?.close();
-    log("socket destroyed");
+    log(`socket ${this.id} destroyed`);
   }
 }

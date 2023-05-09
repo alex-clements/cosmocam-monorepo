@@ -1,11 +1,15 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { types as mediasoupTypes } from "mediasoup-client";
-import { createLogger } from "@cosmocam/shared";
+import { createLogger, loggingFiles } from "@cosmocam/shared";
+import { fetchActiveStreams } from "../services/socket";
+import { useUserContext } from "../components/Context/Providers";
 const mediasoupClient = require("mediasoup-client");
 
-const loggingEnabled = false;
-const log = createLogger(loggingEnabled, "Frontend Stream File:");
+const log = createLogger(
+  !!loggingFiles.FRONTEND_STREAM,
+  "Frontend Stream File:"
+);
 
 let params: any = {
   encoding: [
@@ -196,7 +200,7 @@ export const useReceiverStream = (
       "startProducer",
       { producerSocketId: socketId },
       ({ producerId }) => {
-        console.log("producer id received: ", producerId);
+        log("producer id received: ", producerId);
         goConsume(producerId);
       }
     );
@@ -328,4 +332,35 @@ export const useReceiverStream = (
   }, []);
 
   return { goConsume, fetchProducerId };
+};
+
+export const useFetchActiveStreams = () => {
+  const [activeStreams, setActiveStreams] = useState([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { token } = useUserContext();
+
+  useEffect(() => {
+    fetchActiveStreams({ token }).then((response) => {
+      setActiveStreams(response.data.sockets);
+      setIsLoading(false);
+    });
+  }, [token]);
+
+  return { activeStreams, isLoading };
+};
+
+export const useGetMediaDevices = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [mediaDevices, setMediaDevices] = useState<MediaDeviceInfo[]>([]);
+
+  navigator.mediaDevices.enumerateDevices().then((devices) => {
+    let newDeviceList: any[] = [];
+    for (let device of devices) {
+      if (device.kind === "videoinput") newDeviceList.push(device);
+    }
+    setMediaDevices(newDeviceList);
+    setIsLoading(false);
+  });
+
+  return { isLoading, mediaDevices };
 };

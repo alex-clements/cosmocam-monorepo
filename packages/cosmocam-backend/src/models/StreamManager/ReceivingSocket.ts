@@ -1,10 +1,12 @@
 import { types as mediasoupTypes } from "mediasoup";
 import { Socket } from "socket.io";
 import { SendingSocket } from "./SendingSocket";
-import { createLogger } from "@cosmocam/shared";
+import { createLogger, loggingFiles } from "@cosmocam/shared";
 
-const loggingEnabled = false;
-const log = createLogger(loggingEnabled, "Receiving Socket File: ");
+const log = createLogger(
+  !!loggingFiles.RECEIVING_SOCKET,
+  "Receiving Socket File: "
+);
 
 export class ReceivingSocket {
   private id: string;
