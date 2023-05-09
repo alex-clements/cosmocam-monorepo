@@ -13,14 +13,10 @@ export const ViewPageWrapper = () => {
     if (!socket.current) {
       socket.current = io("/mediasoup");
 
-      socket.current.on(
-        "connection-success",
-        ({ socketId, existsProducer }) => {
-          console.log(socketId, existsProducer);
-          registerReceivingSocket({ token, socketId });
-          setSocketSet(true);
-        }
-      );
+      socket.current.on("connection-success", ({ socketId }) => {
+        registerReceivingSocket({ token, socketId });
+        setSocketSet(true);
+      });
     }
   }, []);
 

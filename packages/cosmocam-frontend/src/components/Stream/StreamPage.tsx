@@ -4,12 +4,17 @@ import Grid from "@mui/material/Grid";
 import { useProducerStream } from "../../hooks/stream";
 import { VideoDeviceSelect } from "./VideoDeviceSelect";
 import { useGetVideo } from "../../hooks/video";
+import { Container } from "@mui/material";
+import { useGetWindowSize } from "../../hooks/util";
 
 export const StreamPage = ({ socket, streaming }) => {
   const localVideo = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream>();
   const [activeDevice, setActiveDevice] = useState<string>("");
-  console.log("streaming: ", streaming);
+
+  const { windowHeight } = useGetWindowSize();
+
+  const windowHeightAdjusted = windowHeight - 2 * 100;
 
   const { startStream, endStream } = useProducerStream({
     socket,
@@ -55,20 +60,25 @@ export const StreamPage = ({ socket, streaming }) => {
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1} sx={{ marginTop: 1 }}>
         <Grid item xs={12}>
-          <video
-            height="240px"
-            autoPlay
-            loop
-            playsInline
-            muted
-            ref={localVideo}
-          ></video>
+          <Container maxWidth="xl">
+            <video
+              height={`${windowHeightAdjusted}px`}
+              width="100%"
+              autoPlay
+              loop
+              playsInline
+              muted
+              ref={localVideo}
+            ></video>
+          </Container>
         </Grid>
-        <Grid item xs={12} sm={5}></Grid>
-        <Grid item xs={12} sm={2}>
-          <VideoDeviceSelect setActiveDevice={setActiveDevice} />
+        <Grid item xs={1} sm={2} md={4}></Grid>
+        <Grid item xs={10} sm={8} md={4}>
+          <Container maxWidth="xl">
+            <VideoDeviceSelect setActiveDevice={setActiveDevice} />
+          </Container>
         </Grid>
-        <Grid item xs={12} sm={5}></Grid>
+        <Grid item xs={1} sm={2} md={4}></Grid>
       </Grid>
     </Box>
   );

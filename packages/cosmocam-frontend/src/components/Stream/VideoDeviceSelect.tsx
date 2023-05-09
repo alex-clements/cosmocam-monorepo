@@ -1,33 +1,31 @@
-import {
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-} from "@mui/material";
-import { useState, Fragment } from "react";
+import { InputLabel, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { useState, Fragment, useEffect } from "react";
 import { CssFormControl } from "../SharedComponents/SharedComponents";
+import { useGetMediaDevices } from "../../hooks/stream";
 
 export const VideoDeviceSelect = ({ setActiveDevice }) => {
-  const [deviceList, setDeviceList] = useState<MediaDeviceInfo[]>([]);
   const [selectedDevice, setSelectedDevice] = useState<string>("");
-
-  navigator.mediaDevices.enumerateDevices().then((devices) => {
-    let newDeviceList: any[] = [];
-    devices.forEach((device) => {
-      if (device.kind === "videoinput") newDeviceList.push(device);
-    });
-    setDeviceList(newDeviceList);
-  });
+  const { mediaDevices, isLoading: isLoadingMediaDevices } =
+    useGetMediaDevices();
 
   const handleChange = (event: SelectChangeEvent) => {
     setSelectedDevice(event.target.value as string);
     setActiveDevice(event.target.value as string);
   };
 
+  useEffect(() => {
+    if (
+      !isLoadingMediaDevices &&
+      mediaDevices.length > 0 &&
+      selectedDevice === ""
+    ) {
+      setSelectedDevice(mediaDevices[0].deviceId);
+    }
+  }, [mediaDevices, isLoadingMediaDevices]);
+
   return (
     <Fragment>
-      {deviceList.length !== 0 && (
+      {mediaDevices.length !== 0 && (
         <CssFormControl fullWidth>
           <InputLabel id="device-select-label" sx={{ color: "white" }}>
             Device
@@ -40,7 +38,7 @@ export const VideoDeviceSelect = ({ setActiveDevice }) => {
             onChange={handleChange}
             sx={{ borderColor: "white", color: "white" }}
           >
-            {deviceList?.map((device) => (
+            {mediaDevices?.map((device) => (
               <MenuItem key={device.deviceId} value={device.deviceId}>
                 {device.label}
               </MenuItem>

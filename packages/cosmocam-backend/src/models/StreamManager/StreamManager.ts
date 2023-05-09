@@ -1,9 +1,8 @@
 import { User } from "./User";
-import { createLogger } from "@cosmocam/shared";
+import { createLogger, loggingFiles } from "@cosmocam/shared";
 import { Socket } from "socket.io";
 
-const loggingEnabled = false;
-const log = createLogger(loggingEnabled, "Stream Manager File:");
+const log = createLogger(!!loggingFiles.STREAM_MANAGER, "Stream Manager File:");
 
 export class StreamManager {
   private users: Map<string, User>;

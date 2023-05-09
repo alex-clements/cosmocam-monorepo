@@ -1,12 +1,10 @@
 import { SendingSocket } from "./SendingSocket";
 import { ReceivingSocket } from "./ReceivingSocket";
 import { types as mediasoupTypes } from "mediasoup";
-import { createLogger } from "@cosmocam/shared";
+import { createLogger, loggingFiles } from "@cosmocam/shared";
 import { Socket } from "socket.io";
-const mediasoup = require("mediasoup");
 
-const LOGGING = false;
-const log = createLogger(LOGGING, "User File:");
+const log = createLogger(!!loggingFiles.USER, "User File:");
 
 export class User {
   private email: string;
