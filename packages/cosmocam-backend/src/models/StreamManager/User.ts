@@ -31,7 +31,7 @@ export class User {
   }
 
   addSendingSocket(socketId: string, socket: Socket) {
-    const sendingSocket = new SendingSocket(socket);
+    const sendingSocket = new SendingSocket(socket, this);
     this.sendingSockets.push(sendingSocket);
   }
 
@@ -75,20 +75,20 @@ export class User {
     log(`User.removeSocket removing receiving socket at index: ${index}`);
   }
 
+  public notifyReceivingSocketsNameChange(socketId: string, name: string) {
+    this.receivingSockets.forEach((receivingSocket) => {
+      receivingSocket.notifyNameChange(socketId, name);
+    });
+  }
+
   getActiveStreams() {
-    const producerIds = [];
-    const socketIds = [];
+    const socketData = [];
 
     for (let socket of this.sendingSockets) {
-      if (socket.getProducer()?.id) {
-        producerIds.push(socket.getProducer()?.id);
-      }
+      let obj = { socketId: socket.getId(), socketName: socket.getName() };
+      socketData.push(obj);
     }
 
-    for (let socket of this.sendingSockets) {
-      socketIds.push(socket.getId());
-    }
-
-    return { producerIds, socketIds };
+    return { socketData };
   }
 }

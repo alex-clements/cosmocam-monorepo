@@ -65,3 +65,8 @@ export interface RequiredLabels {
   newPassword: string;
   username: string;
 }
+
+export interface SocketData {
+  socketId: string;
+  socketName: string;
+}

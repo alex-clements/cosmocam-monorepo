@@ -2,21 +2,31 @@ import { types as mediasoupTypes } from "mediasoup";
 import { Socket } from "socket.io";
 import { ReceivingSocket } from "./ReceivingSocket";
 import { createLogger, loggingFiles } from "@cosmocam/shared";
+import { User } from "./User";
 
 const log = createLogger(!!loggingFiles.SENDING_SOCKET, "SendingSocket File:");
 
 export class SendingSocket {
   private id: string;
+  private name: string;
+  private user: User;
   private viewers: ReceivingSocket[];
   private socket: Socket | undefined;
   private producer: mediasoupTypes.Producer | undefined;
   private producerTransport: mediasoupTypes.WebRtcTransport | undefined;
 
-  constructor(socket: Socket) {
+  constructor(socket: Socket, user: User) {
     this.id = socket.id;
     this.socket = socket;
+    this.name = socket.id;
     this.viewers = [];
+    this.user = user;
     log(`socket ${this.id} created`);
+  }
+
+  public updateName(name: string) {
+    this.name = name || this.id;
+    this.user.notifyReceivingSocketsNameChange(this.id, this.name);
   }
 
   assignProducer(producer: mediasoupTypes.Producer) {
@@ -82,5 +92,9 @@ export class SendingSocket {
     this.producer?.close();
     this.producerTransport?.close();
     log(`socket ${this.id} destroyed`);
+  }
+
+  public getName() {
+    return this.name;
   }
 }

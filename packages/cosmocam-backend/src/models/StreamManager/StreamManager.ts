@@ -66,4 +66,10 @@ export class StreamManager {
   public registerSocket(socket: Socket) {
     this.socketMap.set(socket.id, socket);
   }
+
+  public updateSocketName(socketId: string, name: string) {
+    const user = this.getUserBySocketId(socketId);
+    const sendingSocket = user?.getSendingSocket(socketId);
+    sendingSocket?.updateName(name);
+  }
 }

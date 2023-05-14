@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 import { types as mediasoupTypes } from "mediasoup-client";
-import { createLogger, loggingFiles } from "@cosmocam/shared";
+import { SocketData, createLogger, loggingFiles } from "@cosmocam/shared";
 import { fetchActiveStreams } from "../services/socket";
 import { useUserContext } from "../components/Context/Providers";
 const mediasoupClient = require("mediasoup-client");
@@ -335,13 +335,13 @@ export const useReceiverStream = (
 };
 
 export const useFetchActiveStreams = () => {
-  const [activeStreams, setActiveStreams] = useState([]);
+  const [activeStreams, setActiveStreams] = useState<SocketData[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { token } = useUserContext();
 
   useEffect(() => {
     fetchActiveStreams({ token }).then((response) => {
-      setActiveStreams(response.data.sockets);
+      setActiveStreams(response.data.socketData);
       setIsLoading(false);
     });
   }, [token]);
