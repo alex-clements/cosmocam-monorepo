@@ -67,7 +67,10 @@ export class ReceivingSocket {
   }
 
   public producerIdReceived(producerId: string) {
-    // this.socket?.emit("producer-id-received", { producerId });
     this.callback({ producerId });
+  }
+
+  public notifyNameChange(socketId: string, name: string) {
+    this.socket?.emit("name-update", { socketId, name });
   }
 }

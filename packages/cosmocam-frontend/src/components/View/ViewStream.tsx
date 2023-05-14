@@ -7,10 +7,11 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Grid";
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import { useFetchActiveStreams } from "../../hooks/stream";
 import { useGetWindowSize } from "../../hooks/util";
 import { ViewStreamEmptyState } from "./ViewStreamEmptyState";
+import { SocketData } from "@cosmocam/shared";
 
 interface ViewStreamProps {
   goConsume: any;
@@ -18,87 +19,113 @@ interface ViewStreamProps {
   remoteVideoRef: React.RefObject<HTMLVideoElement>;
 }
 
-export const ViewStream = ({
-  goConsume,
-  fetchProducerId,
-  remoteVideoRef,
-}: ViewStreamProps) => {
-  const [selectedProducerSocketId, setSelectedProducerSocketId] = useState();
+export const ViewStream = forwardRef(
+  (
+    { goConsume, fetchProducerId, remoteVideoRef }: ViewStreamProps,
+    nameUpdateRef
+  ) => {
+    const [selectedSocket, setSelectedSocket] = useState<SocketData>();
+    const [producerSockets, setProducerSockets] = useState<SocketData[]>([]);
 
-  const { windowHeight } = useGetWindowSize();
+    const { windowHeight } = useGetWindowSize();
 
-  const windowHeightAdjusted = windowHeight - 2 * 100;
+    const windowHeightAdjusted = windowHeight - 2 * 100;
 
-  const {
-    activeStreams: producerSocketIds,
-    isLoading: isLoadingActiveStreams,
-  } = useFetchActiveStreams();
+    useImperativeHandle(nameUpdateRef, () => {
+      return {
+        updateName: (socketId: string, name: string) => {
+          let currentProducerSockets: SocketData[] = [];
 
-  console.log(isLoadingActiveStreams);
+          for (let item of producerSockets) {
+            if (item.socketId === socketId) {
+              currentProducerSockets.push({
+                socketId: socketId,
+                socketName: name,
+              });
+            } else {
+              currentProducerSockets.push(item);
+            }
+          }
+          setProducerSockets(currentProducerSockets);
 
-  useEffect(() => {
-    if (!isLoadingActiveStreams) {
-      fetchProducerId(producerSocketIds[0]);
-      setSelectedProducerSocketId(producerSocketIds[0]);
-    }
-  }, [isLoadingActiveStreams]);
+          if (socketId === selectedSocket?.socketId) {
+            let newSelectedSocket = { socketId, socketName: name };
+            setSelectedSocket(newSelectedSocket);
+          }
+        },
+      };
+    });
 
-  const fetchProducerIdHandler = (id) => {
-    if (id !== selectedProducerSocketId) {
-      setSelectedProducerSocketId(id);
-      fetchProducerId(id);
-    }
-  };
+    const { activeStreams, isLoading: isLoadingActiveStreams } =
+      useFetchActiveStreams();
 
-  return isLoadingActiveStreams ? (
-    <CircularProgress />
-  ) : producerSocketIds.length === 0 ? (
-    <ViewStreamEmptyState />
-  ) : (
-    <>
-      <Grid item xs={12} lg={3} order={{ xs: 2, lg: 1 }}>
-        {/* <Box display={{ xs: "none", md: "block" }}> */}
-        <Container maxWidth="xs">
+    useEffect(() => {
+      if (!isLoadingActiveStreams) {
+        setProducerSockets(activeStreams);
+        if (activeStreams.length > 0) {
+          fetchProducerId(activeStreams[0].socketId);
+          setSelectedSocket(activeStreams[0]);
+        }
+      }
+    }, [isLoadingActiveStreams]);
+
+    const fetchProducerIdHandler = (item) => {
+      if (item.socketId !== selectedSocket?.socketId) {
+        setSelectedSocket(item);
+        fetchProducerId(item.socketId);
+      }
+    };
+
+    return isLoadingActiveStreams ? (
+      <CircularProgress />
+    ) : producerSockets.length === 0 ? (
+      <ViewStreamEmptyState />
+    ) : (
+      <>
+        <Grid item xs={12} lg={3} order={{ xs: 2, lg: 1 }}>
+          {/* <Box display={{ xs: "none", md: "block" }}> */}
+          <Container maxWidth="xs">
+            <Stack spacing={2}>
+              <Typography variant="h6" color="white" component="div">
+                Available Cameras
+              </Typography>
+              {producerSockets.map((item) => (
+                <Button
+                  key={item.socketId}
+                  variant="contained"
+                  onClick={() => fetchProducerIdHandler(item)}
+                >
+                  {item.socketName}
+                </Button>
+              ))}
+            </Stack>
+          </Container>
+          {/* </Box> */}
+        </Grid>
+        <Grid item xs={12} lg={9} order={{ xs: 1, lg: 2 }}>
           <Stack spacing={2}>
             <Typography variant="h6" color="white" component="div">
-              Available Cameras
+              Currently Watching {selectedSocket?.socketName}
             </Typography>
-            {producerSocketIds.map((id) => (
-              <Button
-                key={id}
-                variant="contained"
-                onClick={() => fetchProducerIdHandler(id)}
-              >
-                {id}
-              </Button>
-            ))}
+            <Container
+              maxWidth="md"
+              disableGutters
+              sx={{ backgroundColor: "black" }}
+            >
+              <video
+                height={`${windowHeightAdjusted}px`}
+                width="100%"
+                autoPlay
+                loop
+                playsInline
+                muted
+                controls
+                ref={remoteVideoRef}
+              ></video>
+            </Container>
           </Stack>
-        </Container>
-        {/* </Box> */}
-      </Grid>
-      <Grid item xs={12} lg={9} order={{ xs: 1, lg: 2 }}>
-        <Stack spacing={2}>
-          <Typography variant="h6" color="white" component="div">
-            Currently Watching {selectedProducerSocketId}
-          </Typography>
-          <Container
-            maxWidth="md"
-            disableGutters
-            sx={{ backgroundColor: "black" }}
-          >
-            <video
-              height={`${windowHeightAdjusted}px`}
-              width="100%"
-              autoPlay
-              loop
-              playsInline
-              muted
-              controls
-              ref={remoteVideoRef}
-            ></video>
-          </Container>
-        </Stack>
-      </Grid>
-    </>
-  );
-};
+        </Grid>
+      </>
+    );
+  }
+);

@@ -8,6 +8,7 @@ export const StreamPageWrapper = () => {
   const socket = useRef<Socket>();
   const { token } = useUserContext();
   const [streaming, setStreaming] = useState(false);
+  const [socketLoaded, setSocketLoaded] = useState(false);
 
   useEffect(() => {
     if (!socket.current) {
@@ -19,15 +20,15 @@ export const StreamPageWrapper = () => {
 
       socket.current.on("viewer-added", () => {
         console.log("got a viewer!");
-        // streaming.current = true;
         setStreaming(true);
       });
 
       socket.current.on("no-more-viewers", () => {
         console.log("no more viewers :(");
-        // streaming.current = false;
         setStreaming(false);
       });
+
+      setSocketLoaded(true);
     }
 
     return () => {
@@ -35,5 +36,11 @@ export const StreamPageWrapper = () => {
     };
   }, []);
 
-  return <StreamPage socket={socket.current} streaming={streaming} />;
+  return (
+    <>
+      {socket.current && (
+        <StreamPage socket={socket.current} streaming={streaming} />
+      )}
+    </>
+  );
 };

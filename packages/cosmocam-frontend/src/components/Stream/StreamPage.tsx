@@ -6,8 +6,15 @@ import { VideoDeviceSelect } from "./VideoDeviceSelect";
 import { useGetVideo } from "../../hooks/video";
 import { Container } from "@mui/material";
 import { useGetWindowSize } from "../../hooks/util";
+import { StreamNameField } from "./StreamNameField";
+import { Socket } from "socket.io-client";
 
-export const StreamPage = ({ socket, streaming }) => {
+interface StreamPageProps {
+  socket: Socket;
+  streaming: boolean;
+}
+
+export const StreamPage = ({ socket, streaming }: StreamPageProps) => {
   const localVideo = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream>();
   const [activeDevice, setActiveDevice] = useState<string>("");
@@ -21,6 +28,8 @@ export const StreamPage = ({ socket, streaming }) => {
     streamRef,
     activeDevice,
   });
+
+  console.log("socket from above: ", socket);
 
   const { getLocalStream } = useGetVideo({ deviceId: activeDevice });
 
@@ -59,6 +68,16 @@ export const StreamPage = ({ socket, streaming }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1} sx={{ marginTop: 1 }}>
+        <Grid item xs={12} md={6}>
+          <Container maxWidth="xs">
+            <StreamNameField socket={socket} />
+          </Container>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Container maxWidth="xs">
+            <VideoDeviceSelect setActiveDevice={setActiveDevice} />
+          </Container>
+        </Grid>
         <Grid item xs={12}>
           <Container maxWidth="xl">
             <video
@@ -72,13 +91,6 @@ export const StreamPage = ({ socket, streaming }) => {
             ></video>
           </Container>
         </Grid>
-        <Grid item xs={1} sm={2} md={4}></Grid>
-        <Grid item xs={10} sm={8} md={4}>
-          <Container maxWidth="xl">
-            <VideoDeviceSelect setActiveDevice={setActiveDevice} />
-          </Container>
-        </Grid>
-        <Grid item xs={1} sm={2} md={4}></Grid>
       </Grid>
     </Box>
   );

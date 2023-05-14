@@ -4,9 +4,15 @@ import { ViewPage } from "./ViewPage";
 import { io, Socket } from "socket.io-client";
 import { registerReceivingSocket } from "../../services/socket";
 
+interface Test {
+  updateName: (socketId: string, name: string) => void;
+}
+
 export const ViewPageWrapper = () => {
-  const [socketSet, setSocketSet] = useState(false);
   const socket = useRef<Socket>();
+  const nameUpdate = useRef<Test>();
+  const [socketSet, setSocketSet] = useState(false);
+
   const { token } = useUserContext();
 
   useEffect(() => {
@@ -17,12 +23,18 @@ export const ViewPageWrapper = () => {
         registerReceivingSocket({ token, socketId });
         setSocketSet(true);
       });
+
+      socket.current.on("name-update", ({ socketId, name }) => {
+        nameUpdate.current?.updateName(socketId, name);
+      });
     }
   }, []);
 
   return (
     <Fragment>
-      {socketSet && socket.current && <ViewPage socket={socket.current} />}
+      {socketSet && socket.current && (
+        <ViewPage ref={nameUpdate} socket={socket.current} />
+      )}
     </Fragment>
   );
 };

@@ -9,29 +9,31 @@ RUN \
 
 WORKDIR /cosmocam-monorepo
 
-COPY package.json .
-COPY yarn.lock .
-COPY lerna.json .
+COPY . /cosmocam-monorepo
 
-COPY ./packages/cosmocam-backend/src ./packages/cosmocam-backend/src
-COPY ./packages/cosmocam-backend/ssl ./packages/cosmocam-backend/ssl
-COPY ./packages/cosmocam-backend/.env ./packages/cosmocam-backend/.env
-COPY ./packages/cosmocam-backend/package-lock.json ./packages/cosmocam-backend/package-lock.json
-COPY ./packages/cosmocam-backend/package.json ./packages/cosmocam-backend/package.json
-COPY ./packages/cosmocam-backend/server.ts ./packages/cosmocam-backend/server.ts
-COPY ./packages/cosmocam-backend/tsconfig.json ./packages/cosmocam-backend/tsconfig.json
-COPY ./packages/cosmocam-backend/yarn.lock ./packages/cosmocam-backend/yarn.lock
+# COPY package.json .
+# COPY yarn.lock .
+# COPY lerna.json .
 
-COPY ./packages/cosmocam-frontend/src ./packages/cosmocam-frontend/src
-COPY ./packages/cosmocam-frontend/public ./packages/cosmocam-frontend/public
-COPY ./packages/cosmocam-frontend/package.json ./packages/cosmocam-frontend/package.json
-COPY ./packages/cosmocam-frontend/tsconfig.json ./packages/cosmocam-frontend/tsconfig.json
-COPY ./packages/cosmocam-frontend/yarn.lock ./packages/cosmocam-frontend/yarn.lock
+# COPY ./packages/cosmocam-backend/src ./packages/cosmocam-backend/src
+# COPY ./packages/cosmocam-backend/ssl ./packages/cosmocam-backend/ssl
+# COPY ./packages/cosmocam-backend/.env ./packages/cosmocam-backend/.env
+# COPY ./packages/cosmocam-backend/package-lock.json ./packages/cosmocam-backend/package-lock.json
+# COPY ./packages/cosmocam-backend/package.json ./packages/cosmocam-backend/package.json
+# COPY ./packages/cosmocam-backend/server.ts ./packages/cosmocam-backend/server.ts
+# COPY ./packages/cosmocam-backend/tsconfig.json ./packages/cosmocam-backend/tsconfig.json
+# COPY ./packages/cosmocam-backend/yarn.lock ./packages/cosmocam-backend/yarn.lock
 
-COPY ./packages/shared/types ./packages/shared/types
-COPY ./packages/shared/index.ts ./packages/shared/index.ts
-COPY ./packages/shared/package.json ./packages/shared/package.json
-COPY ./packages/shared/tsconfig.json ./packages/shared/tsconfig.json
+# COPY ./packages/cosmocam-frontend/src ./packages/cosmocam-frontend/src
+# COPY ./packages/cosmocam-frontend/public ./packages/cosmocam-frontend/public
+# COPY ./packages/cosmocam-frontend/package.json ./packages/cosmocam-frontend/package.json
+# COPY ./packages/cosmocam-frontend/tsconfig.json ./packages/cosmocam-frontend/tsconfig.json
+# COPY ./packages/cosmocam-frontend/yarn.lock ./packages/cosmocam-frontend/yarn.lock
+
+# COPY ./packages/shared/types ./packages/shared/types
+# COPY ./packages/shared/index.ts ./packages/shared/index.ts
+# COPY ./packages/shared/package.json ./packages/shared/package.json
+# COPY ./packages/shared/tsconfig.json ./packages/shared/tsconfig.json
 
 RUN yarn install
 RUN cd packages/shared && tsc

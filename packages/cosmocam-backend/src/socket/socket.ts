@@ -1,5 +1,5 @@
 import https from "https";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
 import { StreamManagerSingleton } from "../models/StreamManager/StreamManagerSingleton";
 import { getLocalIPAddress, mediaCodecs } from "./util";
@@ -8,10 +8,16 @@ const mediasoup = require("mediasoup");
 
 const log = createLogger(!!loggingFiles.BACKEND_SOCKET, "Socket file:");
 
+const streamManager = StreamManagerSingleton.getStreamManager();
+
 const handleSocketDisconnect = (socket: any) => {
   log(`Socket Disconnected: ${socket.id}`);
-  const streamManager = StreamManagerSingleton.getStreamManager();
   streamManager.removeSocket(socket.id);
+};
+
+const handleSocketNameUpdate = (socket: Socket, name: string) => {
+  log(`Socket ${socket.id} name updated to ${name}`);
+  streamManager.updateSocketName(socket.id, name);
 };
 
 export const socketSetup = (httpsServer: https.Server) => {
@@ -117,6 +123,11 @@ export const socketSetup = (httpsServer: https.Server) => {
       }
 
       receivingSocket.assignToSendingSocket(sendingSocket, callback);
+    });
+
+    socket.on("name-update", async ({ name }) => {
+      log(`socket ${socket.id} name updated to ${name}`);
+      handleSocketNameUpdate(socket, name);
     });
 
     socket.on("disconnect", () => handleSocketDisconnect(socket));

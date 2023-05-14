@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { forwardRef, useImperativeHandle, useRef } from "react";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import { useReceiverStream } from "../../hooks/stream";
@@ -10,24 +10,27 @@ interface ViewPageProps {
   socket: Socket;
 }
 
-export const ViewPage = ({ socket }: ViewPageProps) => {
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const { goConsume, fetchProducerId } = useReceiverStream(
-    socket,
-    remoteVideoRef
-  );
+export const ViewPage = forwardRef(
+  ({ socket }: ViewPageProps, nameUpdateRef) => {
+    const remoteVideoRef = useRef<HTMLVideoElement>(null);
+    const { goConsume, fetchProducerId } = useReceiverStream(
+      socket,
+      remoteVideoRef
+    );
 
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Container maxWidth="xl">
-        <Grid container spacing={1} sx={{ marginTop: 1 }}>
-          <ViewStream
-            goConsume={goConsume}
-            fetchProducerId={fetchProducerId}
-            remoteVideoRef={remoteVideoRef}
-          />
-        </Grid>
-      </Container>
-    </Box>
-  );
-};
+    return (
+      <Box sx={{ flexGrow: 1 }}>
+        <Container maxWidth="xl">
+          <Grid container spacing={1} sx={{ marginTop: 1 }}>
+            <ViewStream
+              goConsume={goConsume}
+              fetchProducerId={fetchProducerId}
+              remoteVideoRef={remoteVideoRef}
+              ref={nameUpdateRef}
+            />
+          </Grid>
+        </Container>
+      </Box>
+    );
+  }
+);
