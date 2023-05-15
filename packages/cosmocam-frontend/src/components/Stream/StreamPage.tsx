@@ -29,8 +29,6 @@ export const StreamPage = ({ socket, streaming }: StreamPageProps) => {
     activeDevice,
   });
 
-  console.log("socket from above: ", socket);
-
   const { getLocalStream } = useGetVideo({ deviceId: activeDevice });
 
   const streamSuccess = (stream: MediaStream) => {
@@ -40,6 +38,8 @@ export const StreamPage = ({ socket, streaming }: StreamPageProps) => {
       localVideo.current.srcObject = stream;
       localVideo.current.play();
     }
+
+    socket.emit("streaming-socket-ready");
 
     if (streaming) startStream();
   };

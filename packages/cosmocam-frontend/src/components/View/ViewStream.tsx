@@ -53,6 +53,42 @@ export const ViewStream = forwardRef(
             setSelectedSocket(newSelectedSocket);
           }
         },
+        updateSocketData: (socketId: string) => {
+          let newProducerSockets: SocketData[] = [...producerSockets];
+          let index = producerSockets.findIndex(
+            (item) => item.socketId === socketId
+          );
+          if (index > -1) {
+            newProducerSockets.splice(index, 1);
+          }
+
+          if (
+            socketId === selectedSocket?.socketId &&
+            newProducerSockets.length > 0
+          ) {
+            fetchProducerIdHandler(newProducerSockets[0]);
+          }
+
+          setProducerSockets(newProducerSockets);
+        },
+        addNewCamera: (socketId: string, name: string) => {
+          let newProducerSockets: SocketData[] = [...producerSockets];
+          let flag: boolean = false;
+          for (let item of newProducerSockets) {
+            if (item.socketId === socketId) {
+              flag = true;
+            }
+          }
+
+          if (!flag) {
+            newProducerSockets.push({ socketId, socketName: name });
+          }
+
+          if (producerSockets.length === 0) {
+            fetchProducerIdHandler(newProducerSockets[0]);
+          }
+          setProducerSockets(newProducerSockets);
+        },
       };
     });
 

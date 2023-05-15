@@ -9,22 +9,23 @@ export const StreamPageWrapper = () => {
   const { token } = useUserContext();
   const [streaming, setStreaming] = useState(false);
   const [socketLoaded, setSocketLoaded] = useState(false);
+  const [socketRegistered, setSocketRegistered] = useState(false);
 
   useEffect(() => {
     if (!socket.current) {
       socket.current = io("/mediasoup");
 
       socket.current.on("connection-success", ({ socketId }) => {
-        registerSendingSocket({ token, socketId });
+        registerSendingSocket({ token, socketId }).then(() => {
+          setSocketRegistered(true);
+        });
       });
 
       socket.current.on("viewer-added", () => {
-        console.log("got a viewer!");
         setStreaming(true);
       });
 
       socket.current.on("no-more-viewers", () => {
-        console.log("no more viewers :(");
         setStreaming(false);
       });
 
@@ -38,7 +39,7 @@ export const StreamPageWrapper = () => {
 
   return (
     <>
-      {socket.current && (
+      {socket.current && socketRegistered && (
         <StreamPage socket={socket.current} streaming={streaming} />
       )}
     </>

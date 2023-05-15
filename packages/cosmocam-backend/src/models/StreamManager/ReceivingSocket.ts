@@ -73,4 +73,12 @@ export class ReceivingSocket {
   public notifyNameChange(socketId: string, name: string) {
     this.socket?.emit("name-update", { socketId, name });
   }
+
+  public notifySocketDisconnect(socketId: string) {
+    this.socket?.emit("socket-disconnected", { socketId });
+  }
+
+  public notifyCameraAdded(socketId: string, name: string) {
+    this.socket?.emit("camera-added", { socketId, name });
+  }
 }

@@ -40,6 +40,14 @@ export class StreamManager {
     log("registerSendingSocket");
   }
 
+  public notifyStreamingSocketReady(socketId: string) {
+    const user = this.getUserBySocketId(socketId);
+    const sendingSocket = user?.getSendingSocket(socketId);
+    if (user && sendingSocket) {
+      user.notifyReceivingSocketsNewCamera(socketId, sendingSocket.getName());
+    }
+  }
+
   public removeSocket(socketId: string) {
     if (this.socketUserMap.has(socketId)) {
       const user = this.socketUserMap.get(socketId);

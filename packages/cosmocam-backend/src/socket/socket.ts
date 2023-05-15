@@ -108,6 +108,11 @@ export const socketSetup = (httpsServer: https.Server) => {
       socketId: socket.id,
     });
 
+    socket.on("streaming-socket-ready", () => {
+      log(`streaming socket ready: ${socket.id}`);
+      streamManager.notifyStreamingSocketReady(socket.id);
+    });
+
     socket.on("startProducer", async ({ producerSocketId }, callback) => {
       const user = streamManager.getUserBySocketId(socket.id);
 
