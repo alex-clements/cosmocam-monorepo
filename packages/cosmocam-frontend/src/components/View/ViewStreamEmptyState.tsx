@@ -2,7 +2,7 @@ import { Container, Typography } from "@mui/material";
 
 export const ViewStreamEmptyState = () => {
   return (
-    <Container>
+    <Container sx={{ paddingTop: "50px" }}>
       <Typography variant="h5" color="white" component="div">
         No cameras connected
       </Typography>
