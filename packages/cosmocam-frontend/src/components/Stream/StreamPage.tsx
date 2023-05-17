@@ -27,11 +27,12 @@ export const StreamPage = ({ socket, streaming }: StreamPageProps) => {
     socket,
     streamRef,
     activeDevice,
+    streaming,
   });
 
   const { getLocalStream } = useGetVideo({ deviceId: activeDevice });
 
-  const streamSuccess = (stream: MediaStream) => {
+  const streamSuccess = (stream: MediaStream, callback: any) => {
     streamRef.current = stream;
 
     if (localVideo.current) {
@@ -41,23 +42,31 @@ export const StreamPage = ({ socket, streaming }: StreamPageProps) => {
 
     socket.emit("streaming-socket-ready");
 
-    if (streaming) startStream();
+    if (streaming) startStream(callback);
+  };
+
+  const setActiveDeviceHandler = (deviceId: string) => {
+    stopVideo();
+    getLocalStream().then((stream) =>
+      streamSuccess(stream, () => {
+        socket.emit("camera-device-updated");
+      })
+    );
+    setActiveDevice(deviceId);
   };
 
   useEffect(() => {
-    stopVideo();
-    getLocalStream().then((stream) => streamSuccess(stream));
-  }, [activeDevice]);
-
-  useEffect(() => {
     if (streaming) {
-      startStream();
+      startStream(undefined);
     } else {
       endStream();
     }
   }, [streaming]);
 
   useEffect(() => {
+    stopVideo();
+    getLocalStream().then((stream) => streamSuccess(stream, undefined));
+
     return () => stopVideo();
   }, []);
 
@@ -75,7 +84,7 @@ export const StreamPage = ({ socket, streaming }: StreamPageProps) => {
         </Grid>
         <Grid item xs={12} md={6}>
           <Container maxWidth="xs">
-            <VideoDeviceSelect setActiveDevice={setActiveDevice} />
+            <VideoDeviceSelect setActiveDevice={setActiveDeviceHandler} />
           </Container>
         </Grid>
         <Grid item xs={12}>

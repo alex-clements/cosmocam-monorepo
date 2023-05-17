@@ -8,6 +8,7 @@ interface Test {
   updateName: (socketId: string, name: string) => void;
   addNewCamera: (socketId: string, name: string) => void;
   updateSocketData: (socketId: string) => void;
+  restartStream: () => void;
 }
 
 export const ViewPageWrapper = () => {
@@ -37,6 +38,10 @@ export const ViewPageWrapper = () => {
 
       socket.current.on("camera-added", ({ socketId, name }) => {
         nameUpdate.current?.addNewCamera(socketId, name);
+      });
+
+      socket.current.on("restart-stream", () => {
+        nameUpdate.current?.restartStream();
       });
     }
   }, []);

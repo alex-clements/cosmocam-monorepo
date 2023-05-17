@@ -81,4 +81,8 @@ export class ReceivingSocket {
   public notifyCameraAdded(socketId: string, name: string) {
     this.socket?.emit("camera-added", { socketId, name });
   }
+
+  public restartStream() {
+    this.socket?.emit("restart-stream");
+  }
 }

@@ -80,4 +80,9 @@ export class StreamManager {
     const sendingSocket = user?.getSendingSocket(socketId);
     sendingSocket?.updateName(name);
   }
+
+  public updateSocketCamera(socket: Socket) {
+    const user = this.getUserBySocketId(socket.id);
+    user?.updateSocketCamera(socket.id);
+  }
 }
