@@ -20,6 +20,11 @@ const handleSocketNameUpdate = (socket: Socket, name: string) => {
   streamManager.updateSocketName(socket.id, name);
 };
 
+const handleSocketChangeCamera = (socket: Socket) => {
+  log(`Socket ${socket.id} camera changed`);
+  streamManager.updateSocketCamera(socket);
+};
+
 export const socketSetup = (httpsServer: https.Server) => {
   const io = new Server(httpsServer);
   let streamManager = StreamManagerSingleton.getStreamManager();
@@ -130,9 +135,24 @@ export const socketSetup = (httpsServer: https.Server) => {
       receivingSocket.assignToSendingSocket(sendingSocket, callback);
     });
 
+    socket.on("get-producer-id", async ({ producerSocketId }, callback) => {
+      const user = streamManager.getUserBySocketId(socket.id);
+      if (!user) return;
+      const sendingSocket = user.getSendingSocket(producerSocketId);
+      if (!sendingSocket) return;
+      const producerId = sendingSocket?.getProducer()?.id;
+      if (!producerId) return;
+      callback({ producerId });
+    });
+
     socket.on("name-update", async ({ name }) => {
       log(`socket ${socket.id} name updated to ${name}`);
       handleSocketNameUpdate(socket, name);
+    });
+
+    socket.on("camera-device-updated", () => {
+      log(`socket ${socket.id} camera device updated`);
+      handleSocketChangeCamera(socket);
     });
 
     socket.on("disconnect", () => handleSocketDisconnect(socket));

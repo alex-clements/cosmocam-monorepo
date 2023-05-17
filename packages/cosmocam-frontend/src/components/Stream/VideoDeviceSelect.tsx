@@ -9,6 +9,8 @@ export const VideoDeviceSelect = ({ setActiveDevice }) => {
     useGetMediaDevices();
 
   const handleChange = (event: SelectChangeEvent) => {
+    console.log("handleChange fired");
+    console.log(`target value: ${event.target.value}`);
     setSelectedDevice(event.target.value as string);
     setActiveDevice(event.target.value as string);
   };

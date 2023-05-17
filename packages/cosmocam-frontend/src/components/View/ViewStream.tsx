@@ -7,16 +7,23 @@ import { ViewStreamEmptyState } from "./ViewStreamEmptyState";
 import { SocketData } from "@cosmocam/shared";
 import { ViewStreamButtons } from "./ViewStreamButtons";
 import { Video } from "./Video";
+import { AnyPtrRecord } from "dns";
 
 interface ViewStreamProps {
   goConsume: any;
   fetchProducerId: any;
+  fetchNewProducerId: any;
   remoteVideoRef: React.RefObject<HTMLVideoElement>;
 }
 
 export const ViewStream = forwardRef(
   (
-    { goConsume, fetchProducerId, remoteVideoRef }: ViewStreamProps,
+    {
+      goConsume,
+      fetchProducerId,
+      fetchNewProducerId,
+      remoteVideoRef,
+    }: ViewStreamProps,
     nameUpdateRef
   ) => {
     const [selectedSocket, setSelectedSocket] = useState<SocketData>();
@@ -72,6 +79,13 @@ export const ViewStream = forwardRef(
       setProducerSockets(newProducerSockets);
     };
 
+    const restartStream = () => {
+      if (selectedSocket) {
+        console.log("restarting stream");
+        fetchNewProducerId(selectedSocket.socketId);
+      }
+    };
+
     const fetchProducerIdHandler = (item: SocketData) => {
       if (item.socketId !== selectedSocket?.socketId) {
         setSelectedSocket(item);
@@ -84,6 +98,7 @@ export const ViewStream = forwardRef(
         updateName,
         updateSocketData,
         addNewCamera,
+        restartStream,
       };
     });
 

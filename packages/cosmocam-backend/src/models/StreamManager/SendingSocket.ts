@@ -97,4 +97,10 @@ export class SendingSocket {
   public getName() {
     return this.name;
   }
+
+  public notifyViewersCameraChange() {
+    this.viewers.forEach((receivingSocket) => {
+      receivingSocket.restartStream();
+    });
+  }
 }

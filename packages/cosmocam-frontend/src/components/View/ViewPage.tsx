@@ -13,10 +13,8 @@ interface ViewPageProps {
 export const ViewPage = forwardRef(
   ({ socket }: ViewPageProps, nameUpdateRef) => {
     const remoteVideoRef = useRef<HTMLVideoElement>(null);
-    const { goConsume, fetchProducerId } = useReceiverStream(
-      socket,
-      remoteVideoRef
-    );
+    const { goConsume, fetchProducerId, fetchNewProducerId } =
+      useReceiverStream(socket, remoteVideoRef);
 
     return (
       <Box sx={{ flexGrow: 1 }}>
@@ -25,6 +23,7 @@ export const ViewPage = forwardRef(
             <ViewStream
               goConsume={goConsume}
               fetchProducerId={fetchProducerId}
+              fetchNewProducerId={fetchNewProducerId}
               remoteVideoRef={remoteVideoRef}
               ref={nameUpdateRef}
             />

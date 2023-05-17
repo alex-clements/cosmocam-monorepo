@@ -104,4 +104,9 @@ export class User {
 
     return { socketData };
   }
+
+  public updateSocketCamera(socketId: string) {
+    const sendingSocket = this.getSendingSocket(socketId);
+    sendingSocket?.notifyViewersCameraChange();
+  }
 }

@@ -6,6 +6,8 @@ import { fetchActiveStreams } from "../services/socket";
 import { useUserContext } from "../components/Context/Providers";
 const mediasoupClient = require("mediasoup-client");
 
+type voidfunc = () => void;
+
 const log = createLogger(
   !!loggingFiles.FRONTEND_STREAM,
   "Frontend Stream File:"
@@ -39,15 +41,18 @@ export const useProducerStream = ({
   socket,
   streamRef,
   activeDevice,
+  streaming,
 }: {
   socket: Socket;
   streamRef: React.MutableRefObject<MediaStream | undefined>;
   activeDevice: string;
+  streaming: boolean;
 }) => {
   let device: any;
   let rtpCapabilities: mediasoupTypes.RtpCapabilities;
   let producerTransport = useRef<any>();
   let producer: any;
+  let callback: voidfunc | undefined;
 
   useEffect(() => {
     if (producerTransport.current) {
@@ -56,7 +61,8 @@ export const useProducerStream = ({
     }
   }, [activeDevice]);
 
-  const startStream = () => {
+  const startStream = (callbackArg: voidfunc | undefined) => {
+    callback = callbackArg;
     const videoTrack = streamRef.current?.getVideoTracks()[0];
     params = {
       ...params,
@@ -157,6 +163,10 @@ export const useProducerStream = ({
     log(params);
     producer = await producerTransport.current.produce(params);
 
+    console.log("send transport connected");
+
+    if (callback) callback();
+
     producer.on("trackended", () => {
       log("track ended");
     });
@@ -201,6 +211,18 @@ export const useReceiverStream = (
       { producerSocketId: socketId },
       ({ producerId }) => {
         log("producer id received: ", producerId);
+        goConsume(producerId);
+      }
+    );
+  };
+
+  const fetchNewProducerId = (socketId: string) => {
+    log("fetching producer id");
+    socket.emit(
+      "get-producer-id",
+      { producerSocketId: socketId },
+      ({ producerId }) => {
+        console.log("producer id received: ", producerId);
         goConsume(producerId);
       }
     );
@@ -331,7 +353,7 @@ export const useReceiverStream = (
     };
   }, []);
 
-  return { goConsume, fetchProducerId };
+  return { goConsume, fetchProducerId, fetchNewProducerId };
 };
 
 export const useFetchActiveStreams = () => {
