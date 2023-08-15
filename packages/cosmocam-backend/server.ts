@@ -30,8 +30,8 @@ app.use((err: any, req: any, res: any, next: any) => {
 });
 
 const options = {
-  key: fs.readFileSync("./ssl/key.pem", "utf-8"),
-  cert: fs.readFileSync("./ssl/cert.pem", "utf-8"),
+  key: fs.readFileSync("./packages/cosmocam-backend/ssl/key.pem", "utf-8"),
+  cert: fs.readFileSync("./packages/cosmocam-backend/ssl/cert.pem", "utf-8"),
 };
 
 const httpsServer = https.createServer(options, app);
