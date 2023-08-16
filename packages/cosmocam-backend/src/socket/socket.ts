@@ -61,9 +61,15 @@ export const socketSetup = (httpsServer: https.Server) => {
 
   const createWebRtcTransport = async (socket: any, callback: any) => {
     try {
-      const localIPAddress: string = getLocalIPAddress();
+      const ipAddress: string = process.env.MEDIASOUP_LISTEN_IP as string;
+      const announcedIp: string = getLocalIPAddress();
       const webRtcTransport_options = {
-        listenIps: [{ ip: localIPAddress }],
+        listenIps: [
+          {
+            ip: ipAddress,
+            announcedIp: process.env.MEDIASOUP_ANNOUNCED_IP,
+          },
+        ],
         enableUdp: true,
         enableTcp: true,
         preferUdp: true,

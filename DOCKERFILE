@@ -7,10 +7,17 @@ RUN \
 	&& apt-get update \
 	&& apt-get install -y net-tools build-essential python3 python3-pip valgrind
 
-WORKDIR /service
+WORKDIR /app
 
-COPY ./packages/cosmocam-backend/ .
-RUN npm install
-RUN NODE_ENV=production
+RUN NODE_ENV=development
+RUN npm install typescript -g
+RUN yarn global add lerna
+COPY . .
+RUN yarn
+RUN tsc -p ./packages/shared/tsconfig.json
+RUN tsc -p ./packages/cosmocam-backend/tsconfig.json
 
-CMD ["node", "dist/server.js"]
+EXPOSE 3001
+
+
+CMD ["node", "packages/cosmocam-backend/dist/server.js"]

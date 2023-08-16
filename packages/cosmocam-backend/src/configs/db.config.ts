@@ -1,1 +1,1 @@
-export const dburi = "mongodb://localhost:2717/test";
+export const dburi = "mongodb://db:27017/test";

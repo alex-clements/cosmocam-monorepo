@@ -9,5 +9,8 @@
   },
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "start": "NODE_ENV=development && node packages/cosmocam-backend/dist/server.js"
+  }
 }

@@ -1,0 +1,33 @@
+networks:
+  cosmocam-network:
+    external: true
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
+
+services:
+  cosmocam:
+    image: cosmocam
+    build: .
+    ports:
+      - "443:3001"
+      - "2000-2100:2000-2100/tcp"
+      - "2000-2100:2000-2100/udp"
+    networks:
+      cosmocam-network:
+        ipv4_address: 172.18.0.3
+    links:
+      - "db:database"
+    env_file:
+      - packages/cosmocam-backend/.env
+    expose:
+      - "2000-2100/tcp"
+      - "2000-2100/udp"
+
+  db:
+    image: mongo
+    ports:
+      - "2717:27017"
+    networks:
+      cosmocam-network:
+        ipv4_address: 172.18.0.2

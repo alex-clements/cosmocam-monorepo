@@ -16,8 +16,13 @@ var userDataSchema = new Schema<User>(
 var UserData = mongoose.model("UserData", userDataSchema);
 
 const connect = async () => {
-  await mongoose.connect(dburi);
-  console.log("Connected to MongoDB");
+  try {
+    await mongoose.connect(dburi);
+    console.log("Connected to MongoDB");
+  } catch (e) {
+    console.log("could not connect to MongoDB");
+    console.log(e);
+  }
   return mongoose;
 };
 
