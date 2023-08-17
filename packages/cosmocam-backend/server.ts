@@ -7,6 +7,10 @@ import fs from "fs";
 import path from "path";
 import https from "https";
 import { socketSetup } from "./src/socket/socket";
+import dotenv from "dotenv";
+
+// get config vars
+dotenv.config();
 
 const app = express();
 const port = 3001;
@@ -29,10 +33,22 @@ app.use((err: any, req: any, res: any, next: any) => {
   return;
 });
 
-const options = {
-  key: fs.readFileSync("./packages/cosmocam-backend/ssl/key.pem", "utf-8"),
-  cert: fs.readFileSync("./packages/cosmocam-backend/ssl/cert.pem", "utf-8"),
-};
+const options =
+  process.env.NODE_ENV == "development"
+    ? {
+        key: fs.readFileSync("./ssl/key.pem", "utf-8"),
+        cert: fs.readFileSync("./ssl/cert.pem", "utf-8"),
+      }
+    : {
+        key: fs.readFileSync(
+          "./packages/cosmocam-backend/ssl/key.pem",
+          "utf-8"
+        ),
+        cert: fs.readFileSync(
+          "./packages/cosmocam-backend/ssl/cert.pem",
+          "utf-8"
+        ),
+      };
 
 const httpsServer = https.createServer(options, app);
 
