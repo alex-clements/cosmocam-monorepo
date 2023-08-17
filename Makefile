@@ -1,4 +1,4 @@
-APPLICATION_NAME ?= ahclemen/cosmocam
+COSMOCAM_APPLICATION_NAME ?= ahclemen/cosmocam
 
 build:
-	docker build --tag ${APPLICATION_NAME} --push .
+	docker build --tag ${COSMOCAM_APPLICATION_NAME} . --file ./docker/main/Dockerfile

@@ -1,14 +1,13 @@
 networks:
   cosmocam-network:
     external: true
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
 
 services:
   cosmocam:
-    image: cosmocam
-    build: .
+    image: ahclemen/cosmocam:latest
+    build:
+      context: .
+      dockerfile: ./docker/main/Dockerfile
     ports:
       - "443:3001"
       - "2000-2100:2000-2100/tcp"
