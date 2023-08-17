@@ -13,7 +13,7 @@ export const StreamPageWrapper = () => {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("/mediasoup");
+      socket.current = io("https://localhost:3002/mediasoup");
 
       socket.current.on("connection-success", ({ socketId }) => {
         registerSendingSocket({ token, socketId }).then(() => {

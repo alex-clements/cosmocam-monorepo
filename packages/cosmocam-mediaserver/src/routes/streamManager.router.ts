@@ -1,7 +1,10 @@
 import { streamManagerController } from "../controllers/streamManager.controller";
 import express from "express";
+import { tokenAuthenticationMiddleware } from "../middlewares/tokenAuthentication.mid";
 
 const router = express.Router();
+
+router.use(tokenAuthenticationMiddleware.authenticateAccessToken);
 
 /* POST Register Sending Socket */
 router.post(

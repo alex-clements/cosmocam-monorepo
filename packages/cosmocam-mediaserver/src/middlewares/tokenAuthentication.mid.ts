@@ -12,8 +12,12 @@ const authenticateAccessToken = async (req: any, res: any, next: any) => {
   let val = await axios.post(url, { token });
 
   try {
-    console.log("val");
-  } catch (err) {}
+    req.body.user = {};
+    req.body.username = val.data.username;
+    req.body.email = val.data.email;
+  } catch (err) {
+    console.log(err);
+  }
 
   next();
 };

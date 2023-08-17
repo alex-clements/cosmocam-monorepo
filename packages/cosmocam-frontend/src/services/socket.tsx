@@ -6,11 +6,9 @@ export const registerSendingSocket = async ({ token, socketId }) => {
     "Content-Type": "application/json",
     Authorization: `bearer ${token}`,
   };
-  return axios.post(
-    apis.REGISTER_SENDING_SOCKET,
-    { socketId },
-    { headers: headers }
-  );
+  let url = "https://localhost:3002" + apis.REGISTER_SENDING_SOCKET;
+
+  return axios.post(url, { socketId }, { headers: headers });
 };
 
 export const registerReceivingSocket = async ({ token, socketId }) => {
@@ -18,11 +16,8 @@ export const registerReceivingSocket = async ({ token, socketId }) => {
     "Content-Type": "application/json",
     Authorization: `bearer ${token}`,
   };
-  return axios.post(
-    apis.REGISTER_RECEIVING_SOCKET,
-    { socketId },
-    { headers: headers }
-  );
+  let url = "https://localhost:3002" + apis.REGISTER_RECEIVING_SOCKET;
+  return axios.post(url, { socketId }, { headers: headers });
 };
 
 export const fetchActiveStreams = async ({ token }: { token: string }) => {
@@ -30,6 +25,7 @@ export const fetchActiveStreams = async ({ token }: { token: string }) => {
     "Content-Type": "application/json",
     Authorization: `bearer ${token}`,
   };
+  let url = "https://localhost:3002" + apis.GET_ACTIVE_STREAMS;
 
-  return axios.get(apis.GET_ACTIVE_STREAMS, { headers });
+  return axios.get(url, { headers });
 };

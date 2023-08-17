@@ -20,7 +20,7 @@ export const ViewPageWrapper = () => {
 
   useEffect(() => {
     if (!socket.current) {
-      socket.current = io("/mediasoup");
+      socket.current = io("https://localhost:3002/mediasoup");
 
       socket.current.on("connection-success", ({ socketId }) => {
         registerReceivingSocket({ token, socketId }).then(() => {

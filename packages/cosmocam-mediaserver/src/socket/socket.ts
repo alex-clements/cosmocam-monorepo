@@ -26,7 +26,7 @@ const handleSocketChangeCamera = (socket: Socket) => {
 };
 
 export const socketSetup = (httpsServer: https.Server) => {
-  const io = new Server(httpsServer);
+  const io = new Server(httpsServer, { cors: { origin: "*" } });
   let streamManager = StreamManagerSingleton.getStreamManager();
   let worker: mediasoupTypes.Worker;
 
