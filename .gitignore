@@ -21,6 +21,18 @@ packages/cosmocam-backend/ssl/
 # compiled js files
 packages/cosmocam-backend/dist/
 
+### Media Server
+
+# dependencies
+packages/cosmocam-mediaserver/node_modules/
+
+# secrets
+packages/cosmocam-mediaserver/.env
+packages/cosmocam-mediaserver/ssl/
+
+# compiled js files
+packages/cosmocam-mediaserver/dist/
+
 ### Front end
 
 # dependencies
