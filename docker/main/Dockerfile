@@ -18,5 +18,4 @@ RUN tsc -p ./packages/cosmocam-backend/tsconfig.json
 
 EXPOSE 3001
 
-
 CMD ["node", "packages/cosmocam-backend/dist/server.js"]
