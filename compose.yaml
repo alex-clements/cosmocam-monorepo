@@ -10,8 +10,6 @@ services:
       dockerfile: ./docker/main/Dockerfile
     ports:
       - "443:3001"
-      # - "2000-2100:2000-2100/tcp"
-      # - "2000-2100:2000-2100/udp"
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.3
@@ -19,9 +17,6 @@ services:
       - "db:database"
     env_file:
       - packages/cosmocam-backend/.env
-    # expose:
-    #   - "2000-2100/tcp"
-    #   - "2000-2100/udp"
 
   mediaserver:
     image: ahclemen/cosmocam-mediaserver:latest
@@ -38,7 +33,7 @@ services:
     links:
       - "db:database"
     env_file:
-      - packages/cosmocam-backend/.env
+      - packages/cosmocam-mediaserver/.env
     expose:
       - "2000-2100/tcp"
       - "2000-2100/udp"
