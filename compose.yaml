@@ -25,7 +25,7 @@ services:
       - "2000-2100/udp"
 
   db:
-    image: mongo
+    image: mongo:4.4.18
     ports:
       - "2717:27017"
     networks:

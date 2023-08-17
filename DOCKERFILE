@@ -1,11 +1,10 @@
-FROM node:18 
-# AS stage-one
+FROM node:18
 
-# Install DEB dependencies and others.
+# Install dependencies
 RUN \
 	set -x \
 	&& apt-get update \
-	&& apt-get install -y net-tools build-essential python3 python3-pip valgrind
+	&& apt-get install -y net-tools build-essential python3 python3-pip
 
 WORKDIR /app
 

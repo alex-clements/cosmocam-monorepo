@@ -1,4 +1,4 @@
-APPLICATION_NAME ?= ahclemen/general
+APPLICATION_NAME ?= ahclemen/cosmocam
 
 build:
-	docker build --tag ${APPLICATION_NAME} .
+	docker build --tag ${APPLICATION_NAME} --push .
