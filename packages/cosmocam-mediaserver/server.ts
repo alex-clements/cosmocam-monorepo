@@ -2,6 +2,7 @@ import express from "express";
 import streamManagerRouter from "./src/routes/streamManager.router";
 import fs from "fs";
 import https from "https";
+import http from "http";
 import { socketSetup } from "./src/socket/socket";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -11,6 +12,11 @@ dotenv.config();
 
 const app = express();
 const port = 3002;
+
+app.use((req: any, res: any, next: any) => {
+  console.log("received request");
+  next();
+});
 
 app.use(cors());
 app.use(express.json());
@@ -41,7 +47,7 @@ const options =
         ),
       };
 
-const httpsServer = https.createServer(options, app);
+const httpsServer = http.createServer(app);
 
 httpsServer.listen(port, () => {
   console.log(`Mediaserver listening at port: ${port}`);

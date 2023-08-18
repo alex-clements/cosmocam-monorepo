@@ -3,6 +3,7 @@ import { io, Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 import { registerSendingSocket } from "../../services/socket";
 import { useUserContext } from "../Context/Providers";
+import { fetchUserMediaServer } from "../../services/mediaserver";
 
 export const StreamPageWrapper = () => {
   const socket = useRef<Socket>();
@@ -12,11 +13,20 @@ export const StreamPageWrapper = () => {
   const [socketRegistered, setSocketRegistered] = useState(false);
 
   useEffect(() => {
+    setupSocket();
+    return () => {
+      socket.current?.disconnect();
+    };
+  }, []);
+
+  const setupSocket = async () => {
     if (!socket.current) {
-      socket.current = io("https://localhost:3002/mediasoup");
+      let val = await fetchUserMediaServer({ token });
+      let mediaServerUrl = val.data;
+      socket.current = io("https://" + mediaServerUrl + "/mediasoup");
 
       socket.current.on("connection-success", ({ socketId }) => {
-        registerSendingSocket({ token, socketId }).then(() => {
+        registerSendingSocket({ token, socketId, mediaServerUrl }).then(() => {
           setSocketRegistered(true);
         });
       });
@@ -31,11 +41,7 @@ export const StreamPageWrapper = () => {
 
       setSocketLoaded(true);
     }
-
-    return () => {
-      socket.current?.disconnect();
-    };
-  }, []);
+  };
 
   return (
     <>

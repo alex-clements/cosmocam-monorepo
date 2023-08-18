@@ -4,6 +4,7 @@ import { types as mediasoupTypes } from "mediasoup-client";
 import { SocketData, createLogger, loggingFiles } from "@cosmocam/shared";
 import { fetchActiveStreams } from "../services/socket";
 import { useUserContext } from "../components/Context/Providers";
+import { fetchUserMediaServer } from "../services/mediaserver";
 const mediasoupClient = require("mediasoup-client");
 
 type voidfunc = () => void;
@@ -362,9 +363,12 @@ export const useFetchActiveStreams = () => {
   const { token } = useUserContext();
 
   useEffect(() => {
-    fetchActiveStreams({ token }).then((response) => {
-      setActiveStreams(response.data.socketData);
-      setIsLoading(false);
+    fetchUserMediaServer({ token }).then((response) => {
+      let mediaServerUrl = response.data;
+      fetchActiveStreams({ token, mediaServerUrl }).then((response) => {
+        setActiveStreams(response.data.socketData);
+        setIsLoading(false);
+      });
     });
   }, [token]);
 

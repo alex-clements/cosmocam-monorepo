@@ -1,9 +1,12 @@
 import express from "express";
 import { mediaserverController } from "../controllers/mediaserver.controller";
+import { tokenAuthenticationMiddleware } from "../middlewares/tokenAuthentication";
 
 const router = express.Router();
 
-/* POST Authenticate User */
-router.post("/user", mediaserverController.getMediaServer);
+router.use(tokenAuthenticationMiddleware.authenticateAccessToken);
+
+/* GET User Media Server */
+router.get("/user", mediaserverController.getMediaServer);
 
 export default router;

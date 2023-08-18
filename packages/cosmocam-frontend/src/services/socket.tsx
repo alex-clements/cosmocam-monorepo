@@ -1,31 +1,44 @@
 import axios from "axios";
 import { apis } from "@cosmocam/shared";
 
-export const registerSendingSocket = async ({ token, socketId }) => {
+export const registerSendingSocket = async ({
+  token,
+  socketId,
+  mediaServerUrl,
+}) => {
   const headers = {
     "Content-Type": "application/json",
     Authorization: `bearer ${token}`,
   };
-  let url = "https://localhost:3002" + apis.REGISTER_SENDING_SOCKET;
+  let url = "https://" + mediaServerUrl + apis.REGISTER_SENDING_SOCKET;
 
   return axios.post(url, { socketId }, { headers: headers });
 };
 
-export const registerReceivingSocket = async ({ token, socketId }) => {
+export const registerReceivingSocket = async ({
+  token,
+  socketId,
+  mediaServerUrl,
+}) => {
   const headers = {
     "Content-Type": "application/json",
     Authorization: `bearer ${token}`,
   };
-  let url = "https://localhost:3002" + apis.REGISTER_RECEIVING_SOCKET;
+  let url = "https://" + mediaServerUrl + apis.REGISTER_RECEIVING_SOCKET;
   return axios.post(url, { socketId }, { headers: headers });
 };
 
-export const fetchActiveStreams = async ({ token }: { token: string }) => {
+export const fetchActiveStreams = async ({
+  token,
+  mediaServerUrl,
+}: {
+  token: string;
+  mediaServerUrl: string;
+}) => {
   const headers = {
     "Content-Type": "application/json",
     Authorization: `bearer ${token}`,
   };
-  let url = "https://localhost:3002" + apis.GET_ACTIVE_STREAMS;
-
+  let url = "https://" + mediaServerUrl + apis.GET_ACTIVE_STREAMS;
   return axios.get(url, { headers });
 };

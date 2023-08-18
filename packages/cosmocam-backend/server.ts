@@ -5,7 +5,7 @@ import mediaserverRouter from "./src/routes/mediaserver.router";
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
-import https from "https";
+import http from "http";
 import dotenv from "dotenv";
 
 // get config vars
@@ -49,7 +49,7 @@ const options =
         ),
       };
 
-const httpsServer = https.createServer(options, app);
+const httpsServer = http.createServer(app);
 
 // Catch all
 app.get("*", (req: Request, res: Response) => {
