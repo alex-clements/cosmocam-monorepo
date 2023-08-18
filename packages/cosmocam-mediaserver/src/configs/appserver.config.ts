@@ -4,4 +4,4 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const appServerHost =
-  process.env.NODE_ENV == "development" ? "localhost:3001" : "cosmocam";
+  process.env.NODE_ENV == "development" ? "localhost:3001" : "cosmocam:3001";

@@ -10,7 +10,6 @@ services:
       dockerfile: ./docker/nginx/Dockerfile
     ports:
       - "443:443"
-      - "80:80"
       - "3003:3003"
     networks:
       cosmocam-network:
@@ -28,6 +27,7 @@ services:
       dockerfile: ./docker/main/Dockerfile
     ports:
       - "3001:3001"
+      - "80:80"
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.3
