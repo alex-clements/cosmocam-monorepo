@@ -1,12 +1,11 @@
 import express from "express";
 import userRouter from "./src/routes/user.router";
 import authenticationRouter from "./src/routes/authentication.router";
-import streamManagerRouter from "./src/routes/streamManager.router";
+import mediaserverRouter from "./src/routes/mediaserver.router";
 import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
-import https from "https";
-import { socketSetup } from "./src/socket/socket";
+import http from "http";
 import dotenv from "dotenv";
 
 // get config vars
@@ -18,7 +17,7 @@ const port = 3001;
 app.use(express.json());
 app.use("/users", userRouter);
 app.use("/authenticate", authenticationRouter);
-app.use("/streamManager", streamManagerRouter);
+app.use("/mediaserver", mediaserverRouter);
 
 app.use(express.static("public"));
 app.use(
@@ -50,7 +49,7 @@ const options =
         ),
       };
 
-const httpsServer = https.createServer(options, app);
+const httpsServer = http.createServer(app);
 
 // Catch all
 app.get("*", (req: Request, res: Response) => {
@@ -66,5 +65,3 @@ app.get("*", (req: Request, res: Response) => {
 httpsServer.listen(port, () => {
   console.log(`Example app listening at port: ${port}`);
 });
-
-socketSetup(httpsServer);

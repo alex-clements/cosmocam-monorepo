@@ -1,4 +1,5 @@
 import https from "https";
+import http from "http";
 import { Server, Socket } from "socket.io";
 import { types as mediasoupTypes } from "mediasoup";
 import { StreamManagerSingleton } from "../models/StreamManager/StreamManagerSingleton";
@@ -25,8 +26,8 @@ const handleSocketChangeCamera = (socket: Socket) => {
   streamManager.updateSocketCamera(socket);
 };
 
-export const socketSetup = (httpsServer: https.Server) => {
-  const io = new Server(httpsServer);
+export const socketSetup = (httpsServer: http.Server) => {
+  const io = new Server(httpsServer, { cors: { origin: "*" } });
   let streamManager = StreamManagerSingleton.getStreamManager();
   let worker: mediasoupTypes.Worker;
 

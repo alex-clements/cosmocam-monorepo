@@ -18,6 +18,6 @@ RUN tsc -p ./packages/cosmocam-backend/tsconfig.json
 RUN tsc -p ./packages/cosmocam-mediaserver/tsconfig.json
 RUN NODE_ENV=production
 
-EXPOSE 3001
+EXPOSE 3002
 
 CMD ["node", "packages/cosmocam-mediaserver/dist/server.js"]

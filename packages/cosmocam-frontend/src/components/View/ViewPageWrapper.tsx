@@ -2,7 +2,12 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useUserContext } from "../Context/Providers";
 import { ViewPage } from "./ViewPage";
 import { io, Socket } from "socket.io-client";
-import { registerReceivingSocket } from "../../services/socket";
+import {
+  fetchActiveStreams,
+  registerReceivingSocket,
+} from "../../services/socket";
+import { fetchUserMediaServer } from "../../services/mediaserver";
+import { apis } from "@cosmocam/shared";
 
 interface Test {
   updateName: (socketId: string, name: string) => void;
@@ -19,13 +24,27 @@ export const ViewPageWrapper = () => {
   const { token } = useUserContext();
 
   useEffect(() => {
+    setupSocket();
+  }, []);
+
+  const setupSocket = async () => {
     if (!socket.current) {
-      socket.current = io("/mediasoup");
+      let val = await fetchUserMediaServer({ token });
+      let mediaServerUrl = val.data;
+
+      let test = await fetchActiveStreams({ token, mediaServerUrl });
+      console.log(test);
+
+      console.log("user media server: ", val);
+
+      socket.current = io("https://" + mediaServerUrl + "/mediasoup");
 
       socket.current.on("connection-success", ({ socketId }) => {
-        registerReceivingSocket({ token, socketId }).then(() => {
-          setSocketSet(true);
-        });
+        registerReceivingSocket({ token, socketId, mediaServerUrl }).then(
+          () => {
+            setSocketSet(true);
+          }
+        );
       });
 
       socket.current.on("name-update", ({ socketId, name }) => {
@@ -44,7 +63,7 @@ export const ViewPageWrapper = () => {
         nameUpdate.current?.restartStream();
       });
     }
-  }, []);
+  };
 
   return (
     <Fragment>
