@@ -13,11 +13,6 @@ dotenv.config();
 const app = express();
 const port = 3002;
 
-app.use((req: any, res: any, next: any) => {
-  console.log("received request");
-  next();
-});
-
 app.use(cors());
 app.use(express.json());
 app.use("/streamManager", streamManagerRouter);
