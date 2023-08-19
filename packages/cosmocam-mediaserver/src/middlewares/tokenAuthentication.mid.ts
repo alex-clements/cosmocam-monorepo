@@ -11,13 +11,10 @@ const authenticateAccessToken = async (req: any, res: any, next: any) => {
   let url = createURL(apis.AUTHENTICATE_TOKEN);
   let val = await axios.post(url, { token });
 
-  console.log("got user stuff");
-
   try {
     req.body.user = {};
     req.body.username = val.data.username;
     req.body.email = val.data.email;
-    console.log("added user to thing");
   } catch (err) {
     console.log(err);
   }
