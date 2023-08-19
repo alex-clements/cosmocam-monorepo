@@ -17,24 +17,21 @@ services:
     volumes:
       - ./packages/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./packages/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./packages/cosmocam-backend/ssl/cert.pem:/etc/nginx/ssl/live/localhost/cert.pem
-      - ./packages/cosmocam-backend/ssl/key.pem:/etc/nginx/ssl/live/localhost/key.pem
+      - ./ssl/cert.pem:/etc/nginx/ssl/live/localhost/cert.pem
+      - ./ssl/key.pem:/etc/nginx/ssl/live/localhost/key.pem
 
   cosmocam:
     image: ahclemen/cosmocam:latest
     build:
       context: .
       dockerfile: ./docker/main/Dockerfile
-    ports:
-      - "3001:3001"
-      - "80:80"
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.3
     links:
       - "db:database"
     env_file:
-      - packages/cosmocam-backend/.env
+      - .env
 
   mediaserver:
     image: ahclemen/cosmocam-mediaserver:latest
@@ -42,7 +39,6 @@ services:
       context: .
       dockerfile: ./docker/mediaserver/Dockerfile
     ports:
-      - "3002:3002"
       - "2000-2100:2000-2100/tcp"
       - "2000-2100:2000-2100/udp"
     networks:
@@ -51,15 +47,12 @@ services:
     links:
       - "db:database"
     env_file:
-      - packages/cosmocam-mediaserver/.env
-    expose:
-      - "2000-2100/tcp"
-      - "2000-2100/udp"
+      - .env
 
   db:
     image: mongo:4.4.18
-    ports:
-      - "2717:27017"
+    # ports:
+    # - "2717:27017"
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.2
