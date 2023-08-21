@@ -2,6 +2,8 @@
 
 Cosmocam is a multi-angle pet camera. It allows users who may have multiple internet-enabled devices with cameras to stream video of their pets through a central server, and then view their video from a single device. This lets users attain a high level of coverage of their homes.
 
+Check out the demo [here](https://ec2-35-93-154-214.us-west-2.compute.amazonaws.com/)!
+
 ## functionality
 
 Cosmocam has a few screens providing the core application functionality:
