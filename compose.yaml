@@ -10,7 +10,6 @@ services:
       dockerfile: ./docker/nginx/Dockerfile
     ports:
       - "443:443"
-      - "3003:3003"
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.5
@@ -44,15 +43,11 @@ services:
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.4
-    links:
-      - "db:database"
     env_file:
       - .env
 
   db:
     image: mongo:4.4.18
-    # ports:
-    # - "2717:27017"
     networks:
       cosmocam-network:
         ipv4_address: 172.18.0.2
