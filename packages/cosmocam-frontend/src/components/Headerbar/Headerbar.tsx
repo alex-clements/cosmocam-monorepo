@@ -45,14 +45,13 @@ export const Headerbar = () => {
         <AppBar position="static">
           <Toolbar variant="dense">
             <div style={styleProps} onClick={() => navigate("/dashboard")}>
-              <a>
-                <img
-                  width="45px"
-                  height="45px"
-                  style={imgProps}
-                  src={CosmoHead}
-                />
-              </a>
+              <img
+                width="45px"
+                height="45px"
+                style={imgProps}
+                src={CosmoHead}
+                alt="cosmo head"
+              />
             </div>
             <Typography
               variant="h6"

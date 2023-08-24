@@ -7,7 +7,7 @@ builder:
 	docker build --tag ${BUILDER_NAME} . --file ./docker/builder/Dockerfile
 
 main:
-	docker build --tag ${COSMOCAM_APPLICATION_NAME} . --file ./docker/main/Dockerfile --push
+	docker build --tag ${COSMOCAM_APPLICATION_NAME} . --file ./docker/main/Dockerfile
 
 nginx:
 	docker build --tag ${COSMOCAM_NGINX_NAME} . --file ./docker/nginx/Dockerfile --push

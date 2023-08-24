@@ -31,6 +31,8 @@ services:
       - "db:database"
     env_file:
       - .env
+    ports:
+      - "3001:3001"
 
   mediaserver:
     image: ahclemen/cosmocam-mediaserver:latest
