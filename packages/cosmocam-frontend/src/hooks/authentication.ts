@@ -11,7 +11,7 @@ import { useToastContext } from "../components/Context/Providers";
 
 export const useAuthenticateUser = () => {
   const navigate = useNavigate();
-  const [cookies, setCookie] = useCookies([cookieValues.USER]);
+  const [_, setCookie] = useCookies([cookieValues.USER]);
   const { setUsername, setEmail, setIsLoggedIn, setToken, setIsLoading } =
     useUserContext();
   const { setToastMessage } = useToastContext();
@@ -45,7 +45,7 @@ export const useAuthenticateUser = () => {
 };
 
 export const useAuthenticateToken = () => {
-  const [cookie, setCookie] = useCookies([cookieValues.USER]);
+  const [cookie, _] = useCookies([cookieValues.USER]);
   const mytoken = cookie?.user?.token;
   const { setUsername, setEmail, setIsLoggedIn, setIsLoading, setToken } =
     useUserContext();

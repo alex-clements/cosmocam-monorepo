@@ -20,6 +20,7 @@ export enum pathNames {
 
 export enum cookieValues {
   USER = "user",
+  DASHBOARD_HELP_TEXT = "dashboard-help-text",
 }
 
 export enum pageNames {
