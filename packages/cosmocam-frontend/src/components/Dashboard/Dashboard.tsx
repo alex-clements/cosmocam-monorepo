@@ -13,13 +13,13 @@ import { useCookies } from "react-cookie";
 
 const modalStyle = {
   position: "absolute" as "absolute",
-  top: "30%",
+  top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   width: 350,
   bgcolor: "#001e3c",
   border: "2px solid #000",
-  borderRadius: 5,
+  borderRadius: 2,
   p: 4,
 };
 
@@ -46,11 +46,11 @@ export const Dashboard = () => {
             devices.
           </Typography>
           <Typography color="white" variant="body1" sx={{ marginTop: 1 }}>
-            Log in from a few different devices and stream video of multiple
+            log in from a few different devices and stream video of multiple
             angles of your home from the stream page.
           </Typography>
           <Typography color="white" variant="body1" sx={{ marginTop: 1 }}>
-            Log in from another device to view the streams on the watch page.
+            log in from another device to view the streams on the watch page.
           </Typography>
         </Box>
       </Modal>
