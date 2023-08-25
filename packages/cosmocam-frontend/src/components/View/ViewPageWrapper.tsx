@@ -8,6 +8,8 @@ import {
 } from "../../services/socket";
 import { fetchUserMediaServer } from "../../services/mediaserver";
 import { apis } from "@cosmocam/shared";
+import { CircularProgress } from "@mui/material";
+import Container from "@mui/material/Container";
 
 interface Test {
   updateName: (socketId: string, name: string) => void;
@@ -67,8 +69,12 @@ export const ViewPageWrapper = () => {
 
   return (
     <Fragment>
-      {socketSet && socket.current && (
+      {socketSet && socket.current ? (
         <ViewPage ref={nameUpdate} socket={socket.current} />
+      ) : (
+        <Container sx={{ paddingY: 5 }}>
+          <CircularProgress />
+        </Container>
       )}
     </Fragment>
   );

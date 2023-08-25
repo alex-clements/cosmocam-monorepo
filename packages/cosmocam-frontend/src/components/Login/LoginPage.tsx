@@ -1,17 +1,23 @@
 import React, { Fragment, useEffect } from "react";
-import Box from "@mui/material/Box";
 import LoginForm from "./LoginForm";
-import Grid from "@mui/material/Grid";
+import LoginHeading from "./LoginHeading";
 import { useUserContext } from "../Context/Providers";
-
-import { Outlet, Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Container from "@mui/material/Container";
+import Grid from "@mui/material/Grid";
 import { CircularProgress } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
+
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 interface LoginPageProps {}
 
 export const LoginPage = ({}: LoginPageProps) => {
   const { isLoading, isLoggedIn } = useUserContext();
   const navigate = useNavigate();
+  const theme = useTheme();
+  const matches = useMediaQuery(theme.breakpoints.up("md"));
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -24,13 +30,18 @@ export const LoginPage = ({}: LoginPageProps) => {
       {isLoading ? (
         <CircularProgress />
       ) : (
-        <Box sx={{ paddingTop: 5, flexGrow: 1 }}>
+        <Box sx={{ paddingTop: matches ? 5 : 1, flexGrow: 1 }}>
           <Grid container spacing={2}>
-            <Grid item md={4} xs={1}></Grid>
-            <Grid item md={4} xs={10}>
-              <LoginForm />
+            <Grid item md={6} xs={12}>
+              <Container sx={{ paddingY: matches ? 5 : 0 }}>
+                <LoginHeading />
+              </Container>
             </Grid>
-            <Grid item md={4} xs={1}></Grid>
+            <Grid item md={4} xs={12}>
+              <Container sx={{ paddingY: matches ? 5 : 3 }} maxWidth="xs">
+                <LoginForm />
+              </Container>
+            </Grid>
           </Grid>
         </Box>
       )}

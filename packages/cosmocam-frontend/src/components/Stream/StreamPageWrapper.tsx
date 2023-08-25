@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { registerSendingSocket } from "../../services/socket";
 import { useUserContext } from "../Context/Providers";
 import { fetchUserMediaServer } from "../../services/mediaserver";
+import { CircularProgress, Container } from "@mui/material";
 
 export const StreamPageWrapper = () => {
   const socket = useRef<Socket>();
@@ -45,8 +46,12 @@ export const StreamPageWrapper = () => {
 
   return (
     <>
-      {socket.current && socketRegistered && (
+      {socket.current && socketRegistered ? (
         <StreamPage socket={socket.current} streaming={streaming} />
+      ) : (
+        <Container sx={{ paddingY: 5 }}>
+          <CircularProgress />
+        </Container>
       )}
     </>
   );

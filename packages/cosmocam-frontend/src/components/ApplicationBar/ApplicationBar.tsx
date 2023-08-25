@@ -37,11 +37,18 @@ export const ApplicationBar = () => {
                 <ArrowBack sx={{ color: "white" }} fontSize="inherit" />
               </IconButton>
             )}
-            <Box sx={{ flexGrow: 1 }}></Box>
-            <Typography variant="h6" color="inherit" component="div">
-              {pageTitle}
-            </Typography>
-            <Box sx={{ flexGrow: 1 }}></Box>
+            <Box sx={{ flexGrow: 1 }}>
+              <Typography
+                variant="h6"
+                color="inherit"
+                component="div"
+                sx={{
+                  marginRight: pageTitle === pageNames.DASHBOARD ? 0 : "40px",
+                }}
+              >
+                {pageTitle}
+              </Typography>
+            </Box>
           </Toolbar>
         </AppBar>
       </Box>

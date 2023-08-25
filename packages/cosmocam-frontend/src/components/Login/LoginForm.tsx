@@ -14,7 +14,7 @@ const LoginForm = () => {
   const [visible, setVisible] = useState<boolean>(true);
 
   const handleKeyDown = (e: any) => {
-    if (e.code == "Enter") handleSubmit();
+    if (e.code === "Enter") handleSubmit();
   };
 
   const { returnFunction: authenticateUser } = useAuthenticateUser();
