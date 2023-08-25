@@ -32,12 +32,12 @@ export const LoginPage = ({}: LoginPageProps) => {
       ) : (
         <Box sx={{ paddingTop: matches ? 5 : 1, flexGrow: 1 }}>
           <Grid container spacing={2}>
-            <Grid item lg={7} md={6} xs={12}>
+            <Grid item md={6} xs={12}>
               <Container sx={{ paddingY: matches ? 5 : 0 }}>
                 <LoginHeading />
               </Container>
             </Grid>
-            <Grid item lg={3} md={4} xs={12}>
+            <Grid item md={4} xs={12}>
               <Container sx={{ paddingY: matches ? 5 : 3 }} maxWidth="xs">
                 <LoginForm />
               </Container>
