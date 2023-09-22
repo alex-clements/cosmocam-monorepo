@@ -14,7 +14,7 @@ export const useAuthenticateUser = () => {
   const [_, setCookie] = useCookies([cookieValues.USER]);
   const { setUsername, setEmail, setIsLoggedIn, setToken, setIsLoading } =
     useUserContext();
-  const { setToastMessage } = useToastContext();
+  const { toast } = useToastContext();
 
   const returnFunction = async ({ password, email }: UserCredentials) => {
     try {
@@ -34,7 +34,7 @@ export const useAuthenticateUser = () => {
 
         navigate(pathNames.DASHBOARD);
       } else {
-        setToastMessage("Wrong username / password combo");
+        toast("Wrong username / password combo", "error");
       }
     } catch (error) {
       console.log(error);

@@ -18,7 +18,7 @@ export const RegisterForm = () => {
   const [passwordValid, setPasswordValid] = useState<boolean>(false);
 
   const handleKeyDown = (e: any) => {
-    if (e.code == "Enter") handleSubmit();
+    if (e.code === "Enter") handleSubmit();
   };
 
   const handleSubmit = async () => {

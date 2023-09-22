@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { ToastType } from "./types";
 
 export interface User {
   username: string;
@@ -44,8 +45,7 @@ export interface UserContextInterface {
 }
 
 export interface ToastContextInterface {
-  toastMessage: string;
-  setToastMessage: Dispatch<SetStateAction<string>>;
+  toast: (message: string, toastType: ToastType) => void;
 }
 
 export interface RequiredLabels {

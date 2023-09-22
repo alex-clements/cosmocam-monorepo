@@ -1,6 +1,10 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { useContext, createContext } from "react";
-import { UserContextInterface, ToastContextInterface } from "@cosmocam/shared";
+import {
+  UserContextInterface,
+  ToastContextInterface,
+  ToastType,
+} from "@cosmocam/shared";
 import { CookiesProvider } from "react-cookie";
 import { Toast } from "../SharedComponents/Toast";
 
@@ -9,8 +13,7 @@ interface ProvidersProps {
 }
 
 const ToastContext = createContext<ToastContextInterface>({
-  toastMessage: "",
-  setToastMessage: () => {},
+  toast: () => {},
 });
 
 const UserContext = createContext<UserContextInterface>({
@@ -38,18 +41,16 @@ export const Providers = ({ children }: ProvidersProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [toastMessage, setToastMessage] = useState<string>("");
   const [toastOpen, setToastOpen] = useState<boolean>(false);
+  const [toastType, setToastType] = useState<ToastType>("info");
 
-  useEffect(() => {
-    if (toastMessage) {
-      setToastOpen(true);
-      setTimeout(() => {
-        setToastOpen(false);
-      }, 1000);
-      setTimeout(() => {
-        setToastMessage("");
-      }, 1100);
-    }
-  }, [toastMessage]);
+  const toast = (message: string, toastType: ToastType) => {
+    setToastOpen(true);
+    setToastMessage(message);
+    setToastType(toastType);
+    setTimeout(() => {
+      setToastOpen(false);
+    }, 1000);
+  };
 
   return (
     <CookiesProvider>
@@ -67,8 +68,12 @@ export const Providers = ({ children }: ProvidersProps) => {
           setIsLoggedIn,
         }}
       >
-        <ToastContext.Provider value={{ toastMessage, setToastMessage }}>
-          <Toast messageProp={toastMessage} openProp={toastOpen} />
+        <ToastContext.Provider value={{ toast }}>
+          <Toast
+            messageProp={toastMessage}
+            openProp={toastOpen}
+            typeProp={toastType}
+          />
           {children}
         </ToastContext.Provider>
       </UserContext.Provider>

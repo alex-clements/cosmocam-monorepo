@@ -1,6 +1,7 @@
 import * as React from "react";
 import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { Alert } from "@mui/material";
+import { ToastType } from "@cosmocam/shared";
 
 export interface State extends SnackbarOrigin {
   open: boolean;
@@ -10,9 +11,10 @@ export interface State extends SnackbarOrigin {
 export interface ToastProps {
   messageProp: string;
   openProp: boolean;
+  typeProp: ToastType;
 }
 
-export const Toast = ({ messageProp, openProp }: ToastProps) => {
+export const Toast = ({ messageProp, openProp, typeProp }: ToastProps) => {
   const [state, setState] = React.useState<State>({
     open: false,
     message: "",
@@ -42,9 +44,15 @@ export const Toast = ({ messageProp, openProp }: ToastProps) => {
         message={message}
         key={vertical + horizontal}
       >
-        <Alert variant="filled" severity="success" color="info">
-          {message}
-        </Alert>
+        {typeProp === "info" ? (
+          <Alert variant="filled" severity="success" color="info">
+            {message}
+          </Alert>
+        ) : (
+          <Alert variant="filled" severity="error" color="info">
+            {message}
+          </Alert>
+        )}
       </Snackbar>
     </div>
   );
